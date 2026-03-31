@@ -36,6 +36,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://gestao-colaboradores.vercel.app",
+  "https://copeople-pr-4.vercel.app",
 ];
 
 app.use(
