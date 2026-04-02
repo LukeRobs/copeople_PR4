@@ -14,38 +14,67 @@ const {
 /**
  * REGISTRO
  */
+/**
+ * REGISTRO
+ */
 const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  console.log("🔥 ARQUIVO AUTH.CONTROLLER CARREGADO");
+  try {
+    const { name, email, password, opsId } = req.body;
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) return errorResponse(res, 'Email já cadastrado', 409);
+    // 🔒 Validação
+    if (!name || !email || !password || !opsId) {
+      return errorResponse(res, 'Nome, email, senha e opsId são obrigatórios', 400);
+    }
 
-  const hashedPassword = await hashPassword(password);
+    const emailFormatted = email.trim().toLowerCase();
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      role: role || 'USER',
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      isActive: true,
-      createdAt: true,
-    },
-  });
+    // 🔍 Verifica se já existe
+    const existing = await prisma.user.findUnique({
+      where: { email: emailFormatted },
+    });
 
-  const token = generateToken({
-    id: user.id,
-    email: user.email,
-    role: user.role
-  });
+    if (existing) {
+      return errorResponse(res, 'Email já cadastrado', 409);
+    }
 
-  return createdResponse(res, { user, token }, 'Usuário registrado com sucesso');
+    // 🔐 Hash da senha
+    const hashedPassword = await hashPassword(password);
+
+    console.log("🔥 ROLE FIXA:", 'LIDERANCA');
+    // 👤 Criação do usuário
+    const user = await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: emailFormatted,
+        password: hashedPassword,
+        role: 'LIDERANCA', // 🔥 FORÇADO
+        opsId: opsId.trim(),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        opsId: true,
+        isActive: true,
+        createdAt: true,
+      },
+    });
+
+    // 🔑 Geração do token
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    return createdResponse(res, { user, token }, 'Usuário registrado com sucesso');
+    
+  } catch (error) {
+    console.error('❌ Erro ao registrar usuário:', error);
+    return errorResponse(res, 'Erro interno ao registrar usuário', 500);
+  }
 };
 
 /**

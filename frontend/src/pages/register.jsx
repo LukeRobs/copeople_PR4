@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, Hash } from "lucide-react";
 import api from "../services/api";
 
 export default function Register() {
@@ -9,6 +9,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [opsId, setOpsId] = useState(""); // 🔥 NOVO
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,7 +17,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !opsId) {
       setError("Preencha todos os campos.");
       return;
     }
@@ -28,6 +29,7 @@ export default function Register() {
         name,
         email,
         password,
+        opsId, // 🔥 ENVIA
       });
 
       navigate("/login", {
@@ -52,7 +54,7 @@ export default function Register() {
             Criar conta
           </h1>
           <p className="text-sm text-[#BFBFC3]">
-            Contas criadas possuem acesso limitado ao sistema
+            Contas criadas possuem acesso de liderança
           </p>
         </div>
 
@@ -76,15 +78,7 @@ export default function Register() {
               placeholder="Nome completo"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="
-                w-full pl-12 pr-4 py-3
-                rounded-xl
-                bg-[#2A2A2C]
-                border border-[#3D3D40]
-                text-white
-                placeholder:text-[#BFBFC3]
-                focus:outline-none focus:ring-1 focus:ring-[#FA4C00]
-              "
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#2A2A2C] border border-[#3D3D40] text-white placeholder:text-[#BFBFC3] focus:outline-none focus:ring-1 focus:ring-[#FA4C00]"
             />
           </div>
 
@@ -96,15 +90,19 @@ export default function Register() {
               placeholder="E-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="
-                w-full pl-12 pr-4 py-3
-                rounded-xl
-                bg-[#2A2A2C]
-                border border-[#3D3D40]
-                text-white
-                placeholder:text-[#BFBFC3]
-                focus:outline-none focus:ring-1 focus:ring-[#FA4C00]
-              "
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#2A2A2C] border border-[#3D3D40] text-white placeholder:text-[#BFBFC3] focus:outline-none focus:ring-1 focus:ring-[#FA4C00]"
+            />
+          </div>
+
+          {/* OPS ID 🔥 */}
+          <div className="relative">
+            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#BFBFC3]" />
+            <input
+              type="text"
+              placeholder="Ops ID (ex: Ops000000)"
+              value={opsId}
+              onChange={(e) => setOpsId(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#2A2A2C] border border-[#3D3D40] text-white placeholder:text-[#BFBFC3] focus:outline-none focus:ring-1 focus:ring-[#FA4C00]"
             />
           </div>
 
@@ -116,15 +114,7 @@ export default function Register() {
               placeholder="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="
-                w-full pl-12 pr-4 py-3
-                rounded-xl
-                bg-[#2A2A2C]
-                border border-[#3D3D40]
-                text-white
-                placeholder:text-[#BFBFC3]
-                focus:outline-none focus:ring-1 focus:ring-[#FA4C00]
-              "
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#2A2A2C] border border-[#3D3D40] text-white placeholder:text-[#BFBFC3] focus:outline-none focus:ring-1 focus:ring-[#FA4C00]"
             />
           </div>
 
@@ -132,13 +122,7 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="
-              w-full py-3 rounded-xl
-              bg-[#FA4C00] hover:bg-[#ff5c1a]
-              text-white font-medium
-              transition
-              disabled:opacity-50
-            "
+            className="w-full py-3 rounded-xl bg-[#FA4C00] hover:bg-[#ff5c1a] text-white font-medium transition disabled:opacity-50"
           >
             {loading ? "Criando conta..." : "Criar conta"}
           </button>
