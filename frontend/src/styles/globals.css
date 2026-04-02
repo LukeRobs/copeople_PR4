@@ -92,3 +92,189 @@ body.exporting-report .recharts-pie {
 @keyframes shimmer {
   100% { transform: translateX(100%); }
 }
+
+/* ================================================
+   LIGHT MODE OVERRIDES
+   Aplica cores claras quando .dark NÃO está no <html>
+   (os componentes usam hex hardcoded do dark theme)
+================================================ */
+
+/* ── Backgrounds principais ── */
+html:not(.dark) .bg-\[\#0D0D0D\] {
+  background-color: #F3F4F6 !important;
+}
+html:not(.dark) .bg-\[\#0D0D0D\]\/90 {
+  background-color: rgba(243, 244, 246, 0.92) !important;
+}
+html:not(.dark) .bg-\[\#1A1A1C\] {
+  background-color: #FFFFFF !important;
+}
+html:not(.dark) .bg-\[\#2A2A2C\] {
+  background-color: #F9FAFB !important;
+}
+html:not(.dark) .bg-\[\#262628\] {
+  background-color: #F9FAFB !important;
+}
+html:not(.dark) .bg-\[\#161618\] {
+  background-color: #F3F4F6 !important;
+}
+
+/* ── Hover backgrounds ── */
+html:not(.dark) .hover\:bg-\[\#1A1A1C\]:hover {
+  background-color: #F3F4F6 !important;
+}
+html:not(.dark) .hover\:bg-\[\#2A2A2C\]:hover {
+  background-color: #E5E7EB !important;
+}
+html:not(.dark) .hover\:bg-\[\#242426\]:hover {
+  background-color: #E5E7EB !important;
+}
+
+/* ── Borders ── */
+html:not(.dark) .border-\[\#3D3D40\] {
+  border-color: #E5E7EB !important;
+}
+html:not(.dark) .border-\[\#2A2A2C\] {
+  border-color: #E5E7EB !important;
+}
+html:not(.dark) .border-\[\#1F1F22\] {
+  border-color: #E5E7EB !important;
+}
+html:not(.dark) .border-\[\#2C2C2F\] {
+  border-color: #E5E7EB !important;
+}
+
+/* ── Texto ── */
+html:not(.dark) .text-\[\#BFBFC3\] {
+  color: #6B7280 !important;
+}
+html:not(.dark) .text-white {
+  color: #111827 !important;
+}
+
+/* Re-aplica branco em ícones/texto sobre fundos coloridos */
+html:not(.dark) .bg-\[\#FA4C00\] .text-white,
+html:not(.dark) .bg-\[\#FA4C00\].text-white,
+html:not(.dark) [class*="bg-red-"] .text-white,
+html:not(.dark) [class*="bg-green-"] .text-white,
+html:not(.dark) [class*="bg-blue-"] .text-white,
+html:not(.dark) [class*="bg-yellow-"] .text-white,
+html:not(.dark) [class*="bg-orange-"] .text-white {
+  color: #FFFFFF !important;
+}
+
+/* ── Input global (.input class) ── */
+html:not(.dark) .input {
+  background-color: #F9FAFB !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+html:not(.dark) .input::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* ── bg-[#242426]: usado em active subitem e hover ── */
+html:not(.dark) .bg-\[\#242426\] {
+  background-color: #F3F4F6 !important;
+}
+
+/* ── Active sidebar items: fundo laranja suave + texto brand ── */
+html:not(.dark) .bg-\[\#2A2A2C\].text-white,
+html:not(.dark) .bg-\[\#242426\].text-white {
+  background-color: #FFF0EB !important;
+  color: #FA4C00 !important;
+}
+
+/* ── Sidebar: borda direita para separar do conteúdo em light ── */
+html:not(.dark) aside.bg-\[\#1A1A1C\] {
+  border-right: 1px solid #E5E7EB;
+}
+
+/* ── Sidebar collapsed/expanded ── */
+html:not(.dark) .bg-\[\#111113\] {
+  background-color: #F3F4F6 !important;
+}
+html:not(.dark) .bg-\[\#0F0F10\] {
+  background-color: #F3F4F6 !important;
+}
+
+/* ── SOC-PR4 badge em light mode ── */
+html:not(.dark) .bg-\[\#FA4C00\]\/15 {
+  background-color: rgba(250, 76, 0, 0.1) !important;
+}
+
+/* ================================================
+   LIGHT MODE — COMPLEMENTO (Round 2)
+================================================ */
+
+/* ── Tailwind semantic tokens (todos dark-only no config) ── */
+html:not(.dark) .bg-surface   { background-color: #FFFFFF !important; }
+html:not(.dark) .bg-bg        { background-color: #F3F4F6 !important; }
+html:not(.dark) .bg-surfaceHover { background-color: #F0F0F0 !important; }
+html:not(.dark) .border-border { border-color: #E5E7EB !important; }
+html:not(.dark) .text-text    { color: #111827 !important; }
+html:not(.dark) .text-muted   { color: #6B7280 !important; }
+html:not(.dark) .text-muted2  { color: #9CA3AF !important; }
+
+/* ── Backgrounds escuros adicionais ── */
+html:not(.dark) .bg-\[\#0B0B0B\],
+html:not(.dark) .bg-\[\#0E0E0F\],
+html:not(.dark) .bg-\[\#0F0F0F\],
+html:not(.dark) .bg-\[\#0F0F11\] { background-color: #F3F4F6 !important; }
+
+html:not(.dark) .bg-\[\#111111\] { background-color: #F9FAFB !important; }
+
+html:not(.dark) .bg-\[\#121214\] { background-color: #F3F4F6 !important; }
+
+html:not(.dark) .bg-\[\#131313\],
+html:not(.dark) .bg-\[\#141414\],
+html:not(.dark) .bg-\[\#141416\] { background-color: #F3F4F6 !important; }
+
+html:not(.dark) .bg-\[\#151515\],
+html:not(.dark) .bg-\[\#151517\] { background-color: #FFFFFF !important; }
+
+html:not(.dark) .bg-\[\#1A1A1A\] { background-color: #F3F4F6 !important; }
+
+html:not(.dark) .bg-\[\#1C1C1F\],
+html:not(.dark) .bg-\[\#1c1c1c\] { background-color: #FFFFFF !important; }
+
+html:not(.dark) .bg-\[\#1E1E20\] { background-color: #F9FAFB !important; }
+
+/* ── Botão desabilitado (bg-[#3D3D40]) ── */
+html:not(.dark) .bg-\[\#3D3D40\] {
+  background-color: #D1D5DB !important;
+  color: #6B7280 !important;
+}
+
+/* ── Borders adicionais ── */
+html:not(.dark) .border-\[\#1F1F1F\],
+html:not(.dark) .border-\[\#1A1A1A\],
+html:not(.dark) .border-\[\#181818\],
+html:not(.dark) .border-\[\#2A2A2A\],
+html:not(.dark) .border-\[\#2A2A2D\],
+html:not(.dark) .border-\[\#2C2C2F\],
+html:not(.dark) .border-\[\#2F2F33\],
+html:not(.dark) .border-\[\#3A3A3C\] { border-color: #E5E7EB !important; }
+
+/* ── Texto quase-branco (invisível em fundo claro) ── */
+html:not(.dark) .text-\[\#E5E5E5\],
+html:not(.dark) .text-\[\#EDEDED\],
+html:not(.dark) .text-\[\#E5E7EB\],
+html:not(.dark) .text-\[\#D1D5DB\] { color: #374151 !important; }
+
+/* ── Shorthands hex e variantes adicionais ── */
+html:not(.dark) .bg-\[\#222\],
+html:not(.dark) .hover\:bg-\[\#222\]:hover { background-color: #F3F4F6 !important; }
+
+html:not(.dark) .bg-\[\#1c1c1c\]  { background-color: #FFFFFF !important; }
+
+/* ── border-white/* (transparente: invisível em fundo claro → usar cinza) ── */
+html:not(.dark) .border-white\/10 { border-color: #E5E7EB !important; }
+html:not(.dark) .border-white\/20 { border-color: #D1D5DB !important; }
+html:not(.dark) .border-white\/5  { border-color: #F3F4F6 !important; }
+
+/* ── Folga Dominical: override do inline style via classe ── */
+html:not(.dark) .folga-page {
+  background: #F3F4F6 !important;
+  color: #111827 !important;
+}

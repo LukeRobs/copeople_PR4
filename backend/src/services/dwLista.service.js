@@ -1,6 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-const { buscarDwPlanejado } = require("./googleSheetsDW.service");
+const { prisma } = require("../config/database");
 
 /* ==========================
    EMPRESAS FIXAS DO DW
@@ -14,28 +12,29 @@ const EMPRESAS_FIXAS = {
 const IDS_EMPRESAS_FIXAS = Object.keys(EMPRESAS_FIXAS).map(Number);
 
 const buscarDwLista = async ({ data, idTurno, idEmpresa }) => {
-  /* ==========================
-     1️⃣ BUSCAR DW REAL
-  ========================== */
-  const where = {
-    idEmpresa: { in: IDS_EMPRESAS_FIXAS }, // 🔒 apenas SRM / Fenix / Horeca
+  const whereBase = {
+    idEmpresa: { in: IDS_EMPRESAS_FIXAS },
   };
 
-  if (data) where.data = new Date(data);
-  if (idTurno) where.idTurno = Number(idTurno);
-
-  // se filtrar por empresa, valida se é uma das 3
+  if (data) whereBase.data = new Date(data);
+  if (idTurno) whereBase.idTurno = Number(idTurno);
   if (idEmpresa && IDS_EMPRESAS_FIXAS.includes(Number(idEmpresa))) {
-    where.idEmpresa = Number(idEmpresa);
+    whereBase.idEmpresa = Number(idEmpresa);
   }
 
-  const dwReais = await prisma.dwReal.findMany({
-    where,
-    orderBy: [
-      { data: "desc" },
-      { idTurno: "asc" },
-    ],
-  });
+  /* ==========================
+     1️⃣ BUSCAR DW REAL E PLANEJADO
+  ========================== */
+  const [dwReais, dwPlanejados] = await Promise.all([
+    prisma.dwReal.findMany({
+      where: whereBase,
+      orderBy: [{ data: "desc" }, { idTurno: "asc" }],
+    }),
+    prisma.dwPlanejado.findMany({
+      where: whereBase,
+      orderBy: [{ data: "desc" }, { idTurno: "asc" }],
+    }),
+  ]);
 
   /* ==========================
      2️⃣ AGRUPAR POR DATA + TURNO
@@ -43,26 +42,17 @@ const buscarDwLista = async ({ data, idTurno, idEmpresa }) => {
   const agrupado = {};
   const turnoMap = { 1: "T1", 2: "T2", 3: "T3" };
 
+  // Inicializa grupos a partir do Real
   for (const r of dwReais) {
     const dataISO = r.data.toISOString().slice(0, 10);
     const chave = `${dataISO}_${r.idTurno}`;
 
     if (!agrupado[chave]) {
-      // 🔹 Planejado (1x por data + turno)
-      const planejadoRes = await buscarDwPlanejado(
-        turnoMap[r.idTurno],
-        dataISO
-      );
-
       agrupado[chave] = {
         data: dataISO,
         turno: turnoMap[r.idTurno],
-        planejado: planejadoRes.data.dwPlanejado,
-        empresas: {
-          SRM: 0,
-          Fenix: 0,
-          Horeca: 0,
-        },
+        planejado: 0,
+        empresas: { SRM: 0, Fenix: 0, Horeca: 0 },
         totalReal: 0,
       };
     }
@@ -74,9 +64,28 @@ const buscarDwLista = async ({ data, idTurno, idEmpresa }) => {
     agrupado[chave].totalReal += r.quantidade;
   }
 
-  return Object.values(agrupado);
+  // Soma o planejado por empresa no grupo correspondente
+  for (const p of dwPlanejados) {
+    const dataISO = p.data.toISOString().slice(0, 10);
+    const chave = `${dataISO}_${p.idTurno}`;
+
+    // cria grupo mesmo se não houver real ainda
+    if (!agrupado[chave]) {
+      agrupado[chave] = {
+        data: dataISO,
+        turno: turnoMap[p.idTurno],
+        planejado: 0,
+        empresas: { SRM: 0, Fenix: 0, Horeca: 0 },
+        totalReal: 0,
+      };
+    }
+
+    agrupado[chave].planejado += p.quantidade;
+  }
+
+  return Object.values(agrupado).sort(
+    (a, b) => new Date(b.data) - new Date(a.data) || a.turno.localeCompare(b.turno)
+  );
 };
 
-module.exports = {
-  buscarDwLista,
-};
+module.exports = { buscarDwLista };

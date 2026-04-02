@@ -13,6 +13,7 @@ import Sidebar  from "../../components/Sidebar";
 import Header   from "../../components/Header";
 import api      from "../../services/api";
 import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
 
 /* ─── TOKENS ──────────────────────────────────────────────────────── */
 const BRAND   = "#FA4C00"
@@ -60,30 +61,32 @@ function formatDateWithWeekday(dateStr) {
   });
 }
 
-/* ─── CSS GLOBAL ──────────────────────────────────────────────────── */
-const CSS = `
-  @keyframes shimmer {
-    0%   { background-position: -600px 0 }
-    100% { background-position:  600px 0 }
-  }
-  @keyframes fadeIn {
-    from { opacity:0; transform:translateY(8px) }
-    to   { opacity:1; transform:translateY(0)   }
-  }
-  .fd-fade { animation: fadeIn 0.28s ease both }
-  .fd-skeleton {
-    background: linear-gradient(90deg,#1f1f1f 25%,#2a2a2a 50%,#1f1f1f 75%);
-    background-size: 600px 100%;
-    animation: shimmer 1.4s infinite linear;
-    border-radius: 10px;
-  }
-  select { color-scheme: dark; }
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
-  ::-webkit-scrollbar        { width:5px; height:5px }
-  ::-webkit-scrollbar-track  { background:#111 }
-  ::-webkit-scrollbar-thumb  { background:#333; border-radius:4px }
-`
+/* ─── CSS GLOBAL — gerado em runtime para suportar dark/light ── */
+function buildCSS(isDark) {
+  return `
+    @keyframes shimmer {
+      0%   { background-position: -600px 0 }
+      100% { background-position:  600px 0 }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(8px) }
+      to   { opacity:1; transform:translateY(0)   }
+    }
+    .fd-fade { animation: fadeIn 0.28s ease both }
+    .fd-skeleton {
+      background: linear-gradient(90deg,${isDark ? "#1f1f1f 25%,#2a2a2a 50%,#1f1f1f" : "#e5e7eb 25%,#f3f4f6 50%,#e5e7eb"} 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: 10px;
+    }
+    select { color-scheme: ${isDark ? "dark" : "light"}; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    ::-webkit-scrollbar        { width:5px; height:5px }
+    ::-webkit-scrollbar-track  { background:${isDark ? "#111" : "#e5e7eb"} }
+    ::-webkit-scrollbar-thumb  { background:${isDark ? "#333" : "#9ca3af"}; border-radius:4px }
+  `;
+}
 
 /* ─── SKELETON ────────────────────────────────────────────────────── */
 function Sk({ h = 40, w = "100%", r = 10 }) {
@@ -336,6 +339,7 @@ function CapacidadeCard({ turno, dias }) {
 export default function FolgaDominicalPage() {
   const navigate = useNavigate();
   const { user }  = useContext(AuthContext);
+  const { isDark } = useContext(ThemeContext);
 
   const isAdmin     = user?.role === "ADMIN";
   const isLideranca = user?.role === "LIDERANCA";
@@ -453,8 +457,8 @@ export default function FolgaDominicalPage() {
 
   /* ────────────────────────────────────────────── */
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#080808", color: "#fff" }}>
-      <style>{CSS}</style>
+    <div className="folga-page" style={{ display: "flex", minHeight: "100vh", background: isDark ? "#080808" : "#F3F4F6", color: isDark ? "#fff" : "#111827" }}>
+      <style>{buildCSS(isDark)}</style>
 
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} navigate={navigate} />
 

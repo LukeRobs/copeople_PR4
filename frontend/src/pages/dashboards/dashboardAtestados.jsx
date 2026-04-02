@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react"
 import {
   ResponsiveContainer,
   AreaChart,
@@ -22,6 +22,13 @@ import {
 import api from "../../services/api"
 import Sidebar from "../../components/Sidebar"
 import Header from "../../components/Header"
+import { ThemeContext } from "../../context/ThemeContext"
+
+/* ─── THEME ────────────────────────────────────────────────────────── */
+const THEME = {
+  dark:  { bg: "#080808", card: "#111111", cardHover: "#161616", border: "rgba(255,255,255,0.07)", borderCard: "rgba(255,255,255,0.06)", textMain: "#F0F0F0", textMuted: "rgba(255,255,255,0.45)", textSubtle: "rgba(255,255,255,0.22)", sectionText: "rgba(255,255,255,0.20)" },
+  light: { bg: "#F3F4F6", card: "#FFFFFF", cardHover: "#F9FAFB", border: "#E5E7EB",              borderCard: "#E5E7EB",              textMain: "#111827", textMuted: "#6B7280",              textSubtle: "#9CA3AF",              sectionText: "#9CA3AF" },
+}
 
 /* ─── TOKENS ─────────────────────────────────────────────────────── */
 const BRAND = "#FA4C00"
@@ -79,39 +86,45 @@ const KPI_META = {
 
 /* ─── KPI CARD ───────────────────────────────────────────────────── */
 function KpiCard({ label, value, loading }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const { Icon = IconDoc, color = BRAND, desc = "" } = KPI_META[label] || {}
   return (
     <div
-      style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.07)", borderLeft: `3px solid ${color}`, borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 8, cursor: "default", transition: "background 0.2s" }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "#161616")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "#111111")}
+      style={{ background: T.card, border: `1px solid ${T.border}`, borderLeft: `3px solid ${color}`, borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 8, cursor: "default", transition: "background 0.2s" }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = T.cardHover)}
+      onMouseLeave={(e) => (e.currentTarget.style.background = T.card)}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <Icon c={color} s={13} />
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 500, margin: 0 }}>{label}</p>
+        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 500, margin: 0 }}>{label}</p>
       </div>
       {loading ? <Skeleton style={{ height: 28, width: "55%" }} /> : (
-        <p style={{ fontSize: 26, fontWeight: 700, color: "#F0F0F0", margin: 0, lineHeight: 1, letterSpacing: "-0.02em" }}>{value ?? "—"}</p>
+        <p style={{ fontSize: 26, fontWeight: 700, color: T.textMain, margin: 0, lineHeight: 1, letterSpacing: "-0.02em" }}>{value ?? "—"}</p>
       )}
-      <p style={{ fontSize: 10, color: "rgba(255,255,255,0.22)", margin: 0 }}>{desc}</p>
+      <p style={{ fontSize: 10, color: T.textSubtle, margin: 0 }}>{desc}</p>
     </div>
   )
 }
 
 /* ─── SECTION LABEL ──────────────────────────────────────────────── */
 function SectionLabel({ num, title }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
       <span style={{ fontSize: 10, fontWeight: 800, color: BRAND, textTransform: "uppercase", letterSpacing: "0.16em" }}>{num}</span>
-      <span style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.16em" }}>{title}</span>
+      <span style={{ fontSize: 10, color: T.sectionText, textTransform: "uppercase", letterSpacing: "0.16em" }}>{title}</span>
     </div>
   )
 }
 
 /* ─── CARD ───────────────────────────────────────────────────────── */
 function Card({ title, subtitle, icon, children, style = {} }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
-    <div style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 18, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16, minWidth: 0, width: "100%", boxSizing: "border-box", ...style }}>
+    <div style={{ background: T.card, border: `1px solid ${T.borderCard}`, borderRadius: 18, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16, minWidth: 0, width: "100%", boxSizing: "border-box", ...style }}>
       {title && (
         <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
           {icon && (
@@ -120,8 +133,8 @@ function Card({ title, subtitle, icon, children, style = {} }) {
             </div>
           )}
           <div>
-            <h2 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.88)" }}>{title}</h2>
-            {subtitle && <p style={{ margin: "3px 0 0", fontSize: 11, color: "rgba(255,255,255,0.30)" }}>{subtitle}</p>}
+            <h2 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: T.textMain }}>{title}</h2>
+            {subtitle && <p style={{ margin: "3px 0 0", fontSize: 11, color: T.textMuted }}>{subtitle}</p>}
           </div>
         </div>
       )}
@@ -132,14 +145,16 @@ function Card({ title, subtitle, icon, children, style = {} }) {
 
 /* ─── DATE INPUT ─────────────────────────────────────────────────── */
 function DateInput({ label, value, onChange }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-      <label style={{ fontSize: 10, color: "#fff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>{label}</label>
+      <label style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>{label}</label>
       <input
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: 13, borderRadius: 12, padding: "9px 14px", outline: "none", cursor: "pointer" }}
+        style={{ background: T.card, border: `1px solid ${T.border}`, color: T.textMain, fontSize: 13, borderRadius: 12, padding: "9px 14px", outline: "none", cursor: "pointer", colorScheme: isDark ? "dark" : "light" }}
       />
     </div>
   )
@@ -147,6 +162,8 @@ function DateInput({ label, value, onChange }) {
 
 /* ─── SELECT EMPRESA ─────────────────────────────────────────────── */
 function SelectEmpresa({ value, onChange, options }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const selected = options.find((e) => String(e.idEmpresa) === String(value))
@@ -157,22 +174,22 @@ function SelectEmpresa({ value, onChange, options }) {
   }, [])
   return (
     <div ref={ref} style={{ display: "flex", flexDirection: "column", gap: 5, position: "relative" }}>
-      <label style={{ fontSize: 10, color: "#fff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>Empresa</label>
+      <label style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>Empresa</label>
       <div
         onClick={() => setOpen(!open)}
-        style={{ background: "#1A1A1A", border: `1px solid ${open ? "rgba(250,76,0,0.5)" : "rgba(255,255,255,0.08)"}`, color: "#fff", fontSize: 13, borderRadius: 12, padding: "9px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, minWidth: 180, userSelect: "none", transition: "border-color 0.2s" }}
+        style={{ background: T.card, border: `1px solid ${open ? "rgba(250,76,0,0.5)" : T.border}`, color: T.textMain, fontSize: 13, borderRadius: 12, padding: "9px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, minWidth: 180, userSelect: "none", transition: "border-color 0.2s" }}
       >
-        <span style={{ color: selected ? "#fff" : "rgba(255,255,255,0.35)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 160 }}>
+        <span style={{ color: selected ? T.textMain : T.textSubtle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 160 }}>
           {selected ? selected.razaoSocial : "Todas as empresas"}
         </span>
-        <IconChevronDown c="rgba(255,255,255,0.35)" />
+        <IconChevronDown c={T.textSubtle} />
       </div>
       {open && (
-        <div className="hide-scrollbar" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 9999, background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, maxHeight: 240, overflowY: "auto", boxShadow: "0 16px 40px rgba(0,0,0,0.7)", minWidth: "100%" }}>
+        <div className="hide-scrollbar" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 9999, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, maxHeight: 240, overflowY: "auto", boxShadow: "0 16px 40px rgba(0,0,0,0.15)", minWidth: "100%" }}>
           <div
             onClick={() => { onChange(""); setOpen(false) }}
-            style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: !value ? BRAND : "rgba(255,255,255,0.65)", fontWeight: !value ? 600 : 400, borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+            style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: !value ? BRAND : T.textMuted, fontWeight: !value ? 600 : 400, borderBottom: `1px solid ${T.border}` }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.05)" : "#F3F4F6")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
             Todas as empresas
@@ -181,7 +198,7 @@ function SelectEmpresa({ value, onChange, options }) {
             <div
               key={e.idEmpresa}
               onClick={() => { onChange(String(e.idEmpresa)); setOpen(false) }}
-              style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: String(value) === String(e.idEmpresa) ? BRAND : "rgba(255,255,255,0.65)", fontWeight: String(value) === String(e.idEmpresa) ? 600 : 400 }}
+              style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: String(value) === String(e.idEmpresa) ? BRAND : T.textMuted, fontWeight: String(value) === String(e.idEmpresa) ? 600 : 400 }}
               onMouseEnter={(e2) => (e2.currentTarget.style.background = "rgba(250,76,0,0.08)")}
               onMouseLeave={(e2) => (e2.currentTarget.style.background = "transparent")}
             >
@@ -196,6 +213,8 @@ function SelectEmpresa({ value, onChange, options }) {
 
 /* ─── SELECT CID ─────────────────────────────────────────────────── */
 function SelectCID({ value, onChange, options }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const selected = options.find((c) => c.codigo === value)
@@ -206,22 +225,22 @@ function SelectCID({ value, onChange, options }) {
   }, [])
   return (
     <div ref={ref} style={{ display: "flex", flexDirection: "column", gap: 5, position: "relative" }}>
-      <label style={{ fontSize: 10, color: "#fff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>CID</label>
+      <label style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>CID</label>
       <div
         onClick={() => setOpen(!open)}
-        style={{ background: "#1A1A1A", border: `1px solid ${open ? "rgba(250,76,0,0.5)" : "rgba(255,255,255,0.08)"}`, color: "#fff", fontSize: 13, borderRadius: 12, padding: "9px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, minWidth: 160, userSelect: "none", transition: "border-color 0.2s" }}
+        style={{ background: T.card, border: `1px solid ${open ? "rgba(250,76,0,0.5)" : T.border}`, color: T.textMain, fontSize: 13, borderRadius: 12, padding: "9px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, minWidth: 160, userSelect: "none", transition: "border-color 0.2s" }}
       >
-        <span style={{ color: selected ? "#fff" : "rgba(255,255,255,0.35)" }}>
+        <span style={{ color: selected ? T.textMain : T.textSubtle }}>
           {selected ? `${selected.codigo} (${selected.total})` : "Todos os CIDs"}
         </span>
-        <IconChevronDown c="rgba(255,255,255,0.35)" />
+        <IconChevronDown c={T.textSubtle} />
       </div>
       {open && (
-        <div className="hide-scrollbar" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 9999, background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, maxHeight: 240, overflowY: "auto", boxShadow: "0 16px 40px rgba(0,0,0,0.7)", minWidth: "100%" }}>
+        <div className="hide-scrollbar" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 9999, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, maxHeight: 240, overflowY: "auto", boxShadow: "0 16px 40px rgba(0,0,0,0.15)", minWidth: "100%" }}>
           <div
             onClick={() => { onChange(""); setOpen(false) }}
-            style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: !value ? BRAND : "rgba(255,255,255,0.65)", fontWeight: !value ? 600 : 400, borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+            style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: !value ? BRAND : T.textMuted, fontWeight: !value ? 600 : 400, borderBottom: `1px solid ${T.border}` }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.05)" : "#F3F4F6")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
             Todos os CIDs
@@ -230,12 +249,12 @@ function SelectCID({ value, onChange, options }) {
             <div
               key={c.codigo}
               onClick={() => { onChange(c.codigo); setOpen(false) }}
-              style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: value === c.codigo ? BRAND : "rgba(255,255,255,0.65)", fontWeight: value === c.codigo ? 600 : 400 }}
+              style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: value === c.codigo ? BRAND : T.textMuted, fontWeight: value === c.codigo ? 600 : 400 }}
               onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(250,76,0,0.08)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
               {c.codigo} — {CID_DESCRICOES[c.codigo] || "CID"}{" "}
-              <span style={{ color: "rgba(255,255,255,0.30)" }}>({c.total})</span>
+              <span style={{ color: T.textSubtle }}>({c.total})</span>
             </div>
           ))}
         </div>
@@ -246,6 +265,8 @@ function SelectCID({ value, onChange, options }) {
 
 /* ─── SELECT SINTOMA ─────────────────────────────────────────────── */
 function SelectSintoma({ value, onChange }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const sintomas = Object.keys(SINTOMA_CIDS)
@@ -256,22 +277,22 @@ function SelectSintoma({ value, onChange }) {
   }, [])
   return (
     <div ref={ref} style={{ display: "flex", flexDirection: "column", gap: 5, position: "relative" }}>
-      <label style={{ fontSize: 10, color: "#fff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>Sintoma</label>
+      <label style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em" }}>Sintoma</label>
       <div
         onClick={() => setOpen(!open)}
-        style={{ background: "#1A1A1A", border: `1px solid ${open ? "rgba(250,76,0,0.5)" : value ? "rgba(250,76,0,0.35)" : "rgba(255,255,255,0.08)"}`, color: "#fff", fontSize: 13, borderRadius: 12, padding: "9px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, minWidth: 180, userSelect: "none", transition: "border-color 0.2s" }}
+        style={{ background: T.card, border: `1px solid ${open ? "rgba(250,76,0,0.5)" : value ? "rgba(250,76,0,0.35)" : T.border}`, color: T.textMain, fontSize: 13, borderRadius: 12, padding: "9px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, minWidth: 180, userSelect: "none", transition: "border-color 0.2s" }}
       >
-        <span style={{ color: value ? "#fff" : "rgba(255,255,255,0.35)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 160 }}>
+        <span style={{ color: value ? T.textMain : T.textSubtle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 160 }}>
           {value || "Todos os sintomas"}
         </span>
-        <IconChevronDown c="rgba(255,255,255,0.35)" />
+        <IconChevronDown c={T.textSubtle} />
       </div>
       {open && (
-        <div className="hide-scrollbar" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 9999, background: "#1A1A1A", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, maxHeight: 240, overflowY: "auto", boxShadow: "0 16px 40px rgba(0,0,0,0.7)", minWidth: "100%" }}>
+        <div className="hide-scrollbar" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 9999, background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, maxHeight: 240, overflowY: "auto", boxShadow: "0 16px 40px rgba(0,0,0,0.15)", minWidth: "100%" }}>
           <div
             onClick={() => { onChange(""); setOpen(false) }}
-            style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: !value ? BRAND : "rgba(255,255,255,0.65)", fontWeight: !value ? 600 : 400, borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+            style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: !value ? BRAND : T.textMuted, fontWeight: !value ? 600 : 400, borderBottom: `1px solid ${T.border}` }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.05)" : "#F3F4F6")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
             Todos os sintomas
@@ -280,12 +301,12 @@ function SelectSintoma({ value, onChange }) {
             <div
               key={s}
               onClick={() => { onChange(s); setOpen(false) }}
-              style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: value === s ? BRAND : "rgba(255,255,255,0.65)", fontWeight: value === s ? 600 : 400 }}
+              style={{ padding: "10px 14px", fontSize: 13, cursor: "pointer", color: value === s ? BRAND : T.textMuted, fontWeight: value === s ? 600 : 400 }}
               onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(250,76,0,0.08)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
               <span>{s}</span>
-              <span style={{ marginLeft: 8, fontSize: 11, color: "rgba(255,255,255,0.28)" }}>
+              <span style={{ marginLeft: 8, fontSize: 11, color: T.textSubtle }}>
                 ({SINTOMA_CIDS[s].join(", ")})
               </span>
             </div>
@@ -609,8 +630,11 @@ export default function DashboardAtestados() {
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   `
 
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#080808", color: "#fff" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: T.bg, color: T.textMain }}>
       <style>{pulseStyle}</style>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

@@ -118,12 +118,17 @@ export default function Sidebar({ isOpen, onClose }) {
       >
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-6 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#FA4C00]" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-2 h-2 rounded-full bg-[#FA4C00] shrink-0" />
             {!isCollapsed && (
-              <span className="font-semibold text-white tracking-wide">
-                COPEOPLE
-              </span>
+              <div className="flex flex-col leading-none">
+                <span className="font-semibold text-white tracking-wide text-sm">
+                  COPEOPLE
+                </span>
+                <span className="mt-1 text-[10px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded bg-[#FA4C00]/15 text-[#FA4C00] self-start">
+                  SOC-PR4
+                </span>
+              </div>
             )}
           </div>
 
@@ -185,21 +190,24 @@ export default function Sidebar({ isOpen, onClose }) {
 
                 {(isAdmin || isLideranca) && (
                   <>
-                    <SidebarSubItem
+                    {/* SPR4: Gestão Operacional desabilitada */}
+                    {/* <SidebarSubItem
                       label="Gestão Operacional"
                       active={isActive("/dashboard/gestao-operacional")}
                       onClick={() => go("/dashboard/gestao-operacional")}
-                    />
-                    <SidebarSubItem
+                    /> */}
+                    {/* SPR4: Produtividade por Colaborador desabilitada */}
+                    {/* <SidebarSubItem
                       label="Produtividade por Colaborador"
                       active={isActive("/dashboard/produtividade-colaborador")}
                       onClick={() => go("/dashboard/produtividade-colaborador")}
-                    />
-                    <SidebarSubItem
+                    /> */}
+                    {/* SPR4: SPI desabilitado */}
+                    {/* <SidebarSubItem
                       label="SPI"
                       active={isActive("/spi")}
                       onClick={() => go("/spi")}
-                    />
+                    /> */}
                     <SidebarSubItem
                       label="Atestados"
                       active={isActive("/dashboard/atestados")}
@@ -506,7 +514,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <p className="text-xs text-[#BFBFC3]">
               Desenvolvido por:{" "}
               <span className="text-[#FA4C00] font-medium">
-                Lucas e Thiago - SOC-PE2
+                Lucas e Thiago
               </span>
             </p>
           </div>

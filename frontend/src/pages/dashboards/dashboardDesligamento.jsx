@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useContext, useEffect, useState, useMemo } from "react"
 import {
   ResponsiveContainer,
   BarChart,
@@ -17,6 +17,13 @@ import {
 import api from "../../services/api"
 import Sidebar from "../../components/Sidebar"
 import Header from "../../components/Header"
+import { ThemeContext } from "../../context/ThemeContext"
+
+/* ─── THEME ────────────────────────────────────────────────────────── */
+const THEME = {
+  dark:  { bg: "#080808", card: "#111111", cardHover: "#161616", border: "rgba(255,255,255,0.07)", borderCard: "rgba(255,255,255,0.06)", textMain: "#F0F0F0", textMuted: "rgba(255,255,255,0.45)", textSubtle: "rgba(255,255,255,0.22)", sectionText: "rgba(255,255,255,0.20)" },
+  light: { bg: "#F3F4F6", card: "#FFFFFF", cardHover: "#F9FAFB", border: "#E5E7EB",              borderCard: "#E5E7EB",              textMain: "#111827", textMuted: "#6B7280",              textSubtle: "#9CA3AF",              sectionText: "#9CA3AF" },
+}
 
 /* ─── TOKENS ─────────────────────────────────────────────────────── */
 const BRAND = "#FA4C00"
@@ -167,12 +174,14 @@ const KPI_META = {
 
 /* ─── KPI CARD ───────────────────────────────────────────────────── */
 function KpiCard({ label, value, sub, loading }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const { Icon = IconLogOut, color = BRAND, desc = "" } = KPI_META[label] || {}
   return (
     <div
       style={{
-        background: "#111111",
-        border: "1px solid rgba(255,255,255,0.07)",
+        background: T.card,
+        border: `1px solid ${T.border}`,
         borderLeft: `3px solid ${color}`,
         borderRadius: 12,
         padding: "16px 18px",
@@ -182,27 +191,27 @@ function KpiCard({ label, value, sub, loading }) {
         cursor: "default",
         transition: "background 0.2s",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "#161616")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "#111111")}
+      onMouseEnter={(e) => (e.currentTarget.style.background = T.cardHover)}
+      onMouseLeave={(e) => (e.currentTarget.style.background = T.card)}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <Icon c={color} s={13} />
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 500, margin: 0 }}>
+        <p style={{ fontSize: 11, color: T.textMuted, fontWeight: 500, margin: 0 }}>
           {label}
         </p>
       </div>
       {loading ? (
         <Skeleton style={{ height: 28, width: "60%" }} />
       ) : (
-        <p style={{ fontSize: 24, fontWeight: 700, color: "#F0F0F0", margin: 0, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+        <p style={{ fontSize: 24, fontWeight: 700, color: T.textMain, margin: 0, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
           {value ?? "—"}
         </p>
       )}
       {sub && !loading && (
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.30)", margin: 0 }}>{sub}</p>
+        <p style={{ fontSize: 11, color: T.textSubtle, margin: 0 }}>{sub}</p>
       )}
       {!sub && (
-        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.22)", margin: 0 }}>{desc}</p>
+        <p style={{ fontSize: 10, color: T.textSubtle, margin: 0 }}>{desc}</p>
       )}
     </div>
   )
@@ -210,12 +219,14 @@ function KpiCard({ label, value, sub, loading }) {
 
 /* ─── SECTION LABEL ──────────────────────────────────────────────── */
 function SectionLabel({ num, title }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
       <span style={{ fontSize: 10, fontWeight: 800, color: BRAND, textTransform: "uppercase", letterSpacing: "0.16em" }}>
         {num}
       </span>
-      <span style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.16em" }}>
+      <span style={{ fontSize: 10, color: T.sectionText, textTransform: "uppercase", letterSpacing: "0.16em" }}>
         {title}
       </span>
     </div>
@@ -224,11 +235,13 @@ function SectionLabel({ num, title }) {
 
 /* ─── CARD ───────────────────────────────────────────────────────── */
 function Card({ title, subtitle, icon, children, style = {} }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
     <div
       style={{
-        background: "#111111",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: T.card,
+        border: `1px solid ${T.borderCard}`,
         borderRadius: 18,
         padding: "20px 24px",
         display: "flex",
@@ -260,11 +273,11 @@ function Card({ title, subtitle, icon, children, style = {} }) {
             </div>
           )}
           <div>
-            <h2 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.88)" }}>
+            <h2 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: T.textMain }}>
               {title}
             </h2>
             {subtitle && (
-              <p style={{ margin: "3px 0 0", fontSize: 11, color: "rgba(255,255,255,0.30)" }}>
+              <p style={{ margin: "3px 0 0", fontSize: 11, color: T.textMuted }}>
                 {subtitle}
               </p>
             )}
@@ -278,12 +291,14 @@ function Card({ title, subtitle, icon, children, style = {} }) {
 
 /* ─── DATE INPUT ─────────────────────────────────────────────────── */
 function DateInput({ label, value, onChange }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
       <label
         style={{
           fontSize: 10,
-          color: "rgba(255,255,255,0.35)",
+          color: T.textMuted,
           fontWeight: 600,
           textTransform: "uppercase",
           letterSpacing: "0.12em",
@@ -296,18 +311,18 @@ function DateInput({ label, value, onChange }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
-          background: "#1A1A1A",
-          border: "1px solid rgba(255,255,255,0.08)",
-          color: "#fff",
+          background: T.card,
+          border: `1px solid ${T.border}`,
+          color: T.textMain,
           fontSize: 13,
           borderRadius: 12,
           padding: "9px 14px",
           outline: "none",
           cursor: "pointer",
-          colorScheme: "dark",
+          colorScheme: isDark ? "dark" : "light",
         }}
         onFocus={(e) => (e.target.style.borderColor = "rgba(250,76,0,0.5)")}
-        onBlur={(e)  => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
+        onBlur={(e)  => (e.target.style.borderColor = T.border)}
       />
     </div>
   )
@@ -315,13 +330,15 @@ function DateInput({ label, value, onChange }) {
 
 /* ─── TURNO SELECTOR ─────────────────────────────────────────────── */
 function TurnoSelector({ value, onChange }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const options = ["ALL", "T1", "T2", "T3"]
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
       <label
         style={{
           fontSize: 10,
-          color: "rgba(255,255,255,0.35)",
+          color: T.textMuted,
           fontWeight: 600,
           textTransform: "uppercase",
           letterSpacing: "0.12em",
@@ -329,7 +346,7 @@ function TurnoSelector({ value, onChange }) {
       >
         Turno
       </label>
-      <div style={{ display: "flex", gap: 4, background: "#1A1A1A", borderRadius: 12, padding: 4, border: "1px solid rgba(255,255,255,0.08)" }}>
+      <div style={{ display: "flex", gap: 4, background: T.card, borderRadius: 12, padding: 4, border: `1px solid ${T.border}` }}>
         {options.map((opt) => {
           const active = value === opt
           return (
@@ -344,7 +361,7 @@ function TurnoSelector({ value, onChange }) {
                 fontSize: 12,
                 fontWeight: active ? 700 : 500,
                 background: active ? BRAND : "transparent",
-                color: active ? "#fff" : "rgba(255,255,255,0.40)",
+                color: active ? "#fff" : T.textMuted,
                 transition: "all 0.18s",
               }}
             >
@@ -534,8 +551,11 @@ export default function DashboardDesligamento() {
     .recharts-wrapper, .recharts-surface { overflow: visible !important; }
   `
 
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#080808", color: "#fff" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: T.bg, color: T.textMain }}>
       <style>{css}</style>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

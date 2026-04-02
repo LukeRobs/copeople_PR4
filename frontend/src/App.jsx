@@ -145,23 +145,25 @@ export default function App() {
         }
       />
 
-      <Route
+      {/* SPR4: Gestão Operacional desabilitada */}
+      {/* <Route
         path="/dashboard/gestao-operacional"
         element={
           <ProtectedRoute roles={["ADMIN", "LIDERANCA"]}>
             <GestaoOperacional />
           </ProtectedRoute>
         }
-      />
+      /> */}
 
-      <Route
+      {/* SPR4: Produtividade por Colaborador desabilitada */}
+      {/* <Route
         path="/dashboard/produtividade-colaborador"
         element={
           <ProtectedRoute roles={["ADMIN", "LIDERANCA", "OPERACAO"]}>
             <ProdutividadeColaborador />
           </ProtectedRoute>
         }
-      />
+      /> */}
       <Route
         path="/dashboard/desligamento"
         element={
@@ -416,15 +418,16 @@ export default function App() {
         }
       />
 
+      {/* SPR4: SPI desabilitado */}
       {/* ================= SSO - SEGURANÇA E SAÚDE OCUPACIONAL ================= */}
-      <Route
+      {/* <Route
         path="/spi"
         element={
           <ProtectedRoute roles={["ADMIN", "LIDERANCA", "GESTAO"]}>
             <SPI />
           </ProtectedRoute>
         }
-      />
+      /> */}
       <Route
         path="/report"
         element={

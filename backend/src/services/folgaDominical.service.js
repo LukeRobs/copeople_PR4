@@ -796,7 +796,7 @@ async function deletarFolgaDominical({ ano, mes }) {
   const inicio = new Date(ano, mes - 1, 1);
   const fim = new Date(ano, mes, 0, 23, 59, 59, 999);
 
-  const result = await prisma.frequencia.updateMany({
+  const result = await prisma.frequencia.deleteMany({
     where: {
       idTipoAusencia: DSR_ID,
       justificativa: JUSTIFICATIVA_AUTO,
@@ -804,14 +804,6 @@ async function deletarFolgaDominical({ ano, mes }) {
         gte: inicio,
         lte: fim,
       },
-    },
-    data: {
-      idTipoAusencia: null,
-      justificativa: null,
-      registradoPor: null,
-      manual: false,
-      horaEntrada: null,
-      horaSaida: null,
     },
   });
 

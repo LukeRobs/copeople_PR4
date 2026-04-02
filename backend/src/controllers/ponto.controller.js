@@ -110,10 +110,10 @@ function timeToMinutes(timeDate) {
   return d.getUTCHours() * 60 + d.getUTCMinutes(); // geralmente Time(6) vem em UTC
 }
 
-// minutos do "agora" (local)
+// minutos do "agora" — usa UTC para ser consistente com timeToMinutes (horaEntrada é salva como UTC)
 function nowToMinutes(dateObj) {
   const d = new Date(dateObj);
-  return d.getHours() * 60 + d.getMinutes();
+  return d.getUTCHours() * 60 + d.getUTCMinutes();
 }
 
 
@@ -122,9 +122,11 @@ function isDiaDSR(dataOperacional, nomeEscala) {
   const dow = new Date(dataOperacional).getDay();
 
   const dsrMap = {
+    A: [0, 3], // domingo, quarta
+    B: [1, 2], // segunda, terça
+    C: [4, 5], // quinta, sexta
     E: [0, 1], // domingo, segunda
     G: [2, 3], // terça, quarta
-    C: [4, 5], // quinta, sexta
   };
 
   const dias = dsrMap[String(nomeEscala || "").toUpperCase()];
@@ -238,17 +240,35 @@ const registrarPontoCPF = async (req, res) => {
 
     /* ==========================================
        BLOQUEIO ANTECIPAÇÃO T3
+       — Cobre também saída T3 sem jornada aberta
+         (clock-in falhou / Render cold start)
     ========================================== */
 
-    if (
-      !aberta &&
-      colaborador.turno?.nomeTurno === "T3" &&
-      turnoAtual !== "T3"
-    ) {
+    const isT3Worker =
+      colaborador.turno?.nomeTurno?.toUpperCase().includes("T3") ||
+      colaborador.turno?.nomeTurno?.toUpperCase().includes("NOTURNO");
+
+    if (!aberta && isT3Worker && turnoAtual !== "T3") {
       return errorResponse(
         res,
         "Ponto liberado para o T3 somente a partir das 20:50",
         400
+      );
+    }
+
+    /* ==========================================
+       BLOQUEIO SAÍDA T3 SEM JORNADA ABERTA
+       — Impede criar nova ENTRADA durante janela
+         de saída T3 (T1 = 05:00–13:00) quando
+         não há frequência aberta do dia anterior.
+         Ocorre quando clock-in do T3 não foi salvo.
+    ========================================== */
+
+    if (!aberta && turnoAtual === "T1" && isT3Worker) {
+      return errorResponse(
+        res,
+        "Saída T3: nenhuma jornada aberta encontrada. Verifique se a entrada foi registrada ou solicite ajuste ao RH.",
+        409
       );
     }
 
@@ -393,7 +413,19 @@ const registrarPontoCPF = async (req, res) => {
 
     /* ==========================================
        CRIA ENTRADA
+       — Guarda de segurança: bloqueia registro de
+         nova ENTRADA no janela do T3 (T1 e T2)
+         para qualquer colaborador sem jornada aberta,
+         caso os bloqueios anteriores tenham falhado.
     ========================================== */
+
+    if (turnoAtual === "T1" && isT3Worker) {
+      return errorResponse(
+        res,
+        "Horário incompatível para nova entrada T3. Solicite ajuste ao RH.",
+        409
+      );
+    }
 
     const tipoPresenca = await prisma.tipoAusencia.findFirst({
       where: { codigo: "P" },

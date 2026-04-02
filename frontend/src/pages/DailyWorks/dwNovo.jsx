@@ -28,12 +28,10 @@ export default function DwNovoPage() {
   const [form, setForm] = useState({
     data: editData?.data || "",
     idTurno: editData?.turno || "",
-    observacao: "",
-    quantidades: {
-      12: "",
-      13: "",
-      14: "",
-    },
+    observacaoReal: "",
+    observacaoPlanejado: "",
+    real: { 12: "", 13: "", 14: "" },
+    planejado: { 12: "", 13: "", 14: "" },
   });
 
   /* ==============================
@@ -42,31 +40,43 @@ export default function DwNovoPage() {
   useEffect(() => {
     if (!editData?.data || !editData?.turno) return;
 
-    async function loadDwReal() {
+    async function loadDw() {
       try {
         setLoadingDw(true);
 
-        const res = await api.get("/dw/real", {
-          params: {
-            data: editData.data,
-            idTurno: editData.turno,
-          },
+        const [resReal, resPlanejado] = await Promise.all([
+          api.get("/dw/real", {
+            params: { data: editData.data, idTurno: editData.turno },
+          }),
+          api.get("/dw/planejado", {
+            params: { data: editData.data, idTurno: editData.turno },
+          }),
+        ]);
+
+        const registrosReal = resReal.data.data || [];
+        const registrosPlanejado = resPlanejado.data.data || [];
+
+        const novoReal = { 12: "", 13: "", 14: "" };
+        const novoPlanejado = { 12: "", 13: "", 14: "" };
+        let obsReal = "";
+        let obsPlanejado = "";
+
+        registrosReal.forEach((r) => {
+          novoReal[r.idEmpresa] = r.quantidade;
+          if (r.observacao) obsReal = r.observacao;
         });
 
-        const registros = res.data.data || [];
-
-        const novasQuantidades = { 12: "", 13: "", 14: "" };
-        let obs = "";
-
-        registros.forEach((r) => {
-          novasQuantidades[r.idEmpresa] = r.quantidade;
-          if (r.observacao) obs = r.observacao;
+        registrosPlanejado.forEach((r) => {
+          novoPlanejado[r.idEmpresa] = r.quantidade;
+          if (r.observacao) obsPlanejado = r.observacao;
         });
 
         setForm((prev) => ({
           ...prev,
-          quantidades: novasQuantidades,
-          observacao: obs,
+          real: novoReal,
+          planejado: novoPlanejado,
+          observacaoReal: obsReal,
+          observacaoPlanejado: obsPlanejado,
         }));
       } catch (error) {
         console.error("Erro ao carregar DW:", error);
@@ -75,20 +85,22 @@ export default function DwNovoPage() {
       }
     }
 
-    loadDwReal();
+    loadDw();
   }, [editData]);
 
   /* ================= HANDLERS ================= */
 
-  const handleQuantidade = (idEmpresa, value) => {
+  const handleReal = (idEmpresa, value) =>
     setForm((prev) => ({
       ...prev,
-      quantidades: {
-        ...prev.quantidades,
-        [idEmpresa]: value,
-      },
+      real: { ...prev.real, [idEmpresa]: value },
     }));
-  };
+
+  const handlePlanejado = (idEmpresa, value) =>
+    setForm((prev) => ({
+      ...prev,
+      planejado: { ...prev.planejado, [idEmpresa]: value },
+    }));
 
   const handleSave = async () => {
     if (!form.data || !form.idTurno) {
@@ -96,26 +108,43 @@ export default function DwNovoPage() {
       return;
     }
 
-    const valores = Object.values(form.quantidades);
-    if (valores.some((v) => v === "")) {
-      alert("Informe a quantidade real de todas as empresas");
+    const valoresReal = Object.values(form.real);
+    const valoresPlanejado = Object.values(form.planejado);
+
+    if (valoresReal.some((v) => v === "")) {
+      alert("Informe a quantidade Real de todas as empresas");
+      return;
+    }
+    if (valoresPlanejado.some((v) => v === "")) {
+      alert("Informe a quantidade Planejada de todas as empresas");
       return;
     }
 
     try {
       setSaving(true);
 
-      await Promise.all(
-        EMPRESAS.map((e) =>
+      await Promise.all([
+        // Salva Real
+        ...EMPRESAS.map((e) =>
           api.post("/dw/real", {
             data: form.data,
             idTurno: Number(form.idTurno),
             idEmpresa: e.idEmpresa,
-            quantidade: Number(form.quantidades[e.idEmpresa]),
-            observacao: form.observacao || null,
+            quantidade: Number(form.real[e.idEmpresa]),
+            observacao: form.observacaoReal || null,
           })
-        )
-      );
+        ),
+        // Salva Planejado
+        ...EMPRESAS.map((e) =>
+          api.post("/dw/planejado", {
+            data: form.data,
+            idTurno: Number(form.idTurno),
+            idEmpresa: e.idEmpresa,
+            quantidade: Number(form.planejado[e.idEmpresa]),
+            observacao: form.observacaoPlanejado || null,
+          })
+        ),
+      ]);
 
       navigate("/dw");
     } catch (error) {
@@ -197,7 +226,28 @@ export default function DwNovoPage() {
             />
           </Section>
 
-          {/* ================= QUANTIDADES ================= */}
+          {/* ================= PLANEJADO ================= */}
+          <Section title="Quantidade Planejada por Empresa">
+            {EMPRESAS.map((e) => (
+              <Input
+                key={e.idEmpresa}
+                type="number"
+                min="0"
+                label={`${e.nome} *`}
+                value={form.planejado[e.idEmpresa]}
+                onChange={(ev) => handlePlanejado(e.idEmpresa, ev.target.value)}
+              />
+            ))}
+            <Textarea
+              label="Observação Planejado"
+              value={form.observacaoPlanejado}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, observacaoPlanejado: e.target.value }))
+              }
+            />
+          </Section>
+
+          {/* ================= REAL ================= */}
           <Section title="Quantidade Real por Empresa">
             {EMPRESAS.map((e) => (
               <Input
@@ -205,21 +255,15 @@ export default function DwNovoPage() {
                 type="number"
                 min="0"
                 label={`${e.nome} *`}
-                value={form.quantidades[e.idEmpresa]}
-                onChange={(ev) =>
-                  handleQuantidade(e.idEmpresa, ev.target.value)
-                }
+                value={form.real[e.idEmpresa]}
+                onChange={(ev) => handleReal(e.idEmpresa, ev.target.value)}
               />
             ))}
-          </Section>
-
-          {/* ================= OBS ================= */}
-          <Section title="Observações">
             <Textarea
-              label="Observação"
-              value={form.observacao}
+              label="Observação Real"
+              value={form.observacaoReal}
               onChange={(e) =>
-                setForm((p) => ({ ...p, observacao: e.target.value }))
+                setForm((p) => ({ ...p, observacaoReal: e.target.value }))
               }
             />
           </Section>
