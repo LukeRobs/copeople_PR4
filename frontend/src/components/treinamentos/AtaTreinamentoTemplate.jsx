@@ -334,7 +334,7 @@ tbody td {
               <div className="meta">
                 Data do treinamento: <b>{dataTreinamento}</b>
                 <br />
-                Gerado em: <b>{fmtDateBR(new Date())}</b> às <b>{horaGeracao}</b>
+                Hora do treinamento: <b>{horaGeracao}</b>
               </div>
             </div>
           </div>
@@ -344,38 +344,26 @@ tbody td {
             <h2>Dados do Treinamento</h2>
             <div className="grid">
               <div className="field">
-                <div className="label">Processo</div>
-                <div className="value">{treinamento.processo}</div>
-              </div>
-
-              <div className="field">
                 <div className="label">Tema</div>
                 <div className="value">{treinamento.tema}</div>
               </div>
 
               <div className="field">
-                <div className="label">Instrutor / Líder responsável</div>
+                <div className="label">Instrutor / Líder</div>
                 <div className="value">{lider}</div>
               </div>
 
               <div className="field">
-                <div className="label">Status</div>
-                <div className="value">{treinamento.status}</div>
+                <div className="label">Setores</div>
+                <div className="value">{setores.length ? setores.join(", ") : "-"}</div>
+              </div>
+
+              <div className="field">
+                <div className="label">Processo</div>
+                <div className="value">{treinamento.processo}</div>
               </div>
             </div>
 
-            {!!setores.length && (
-              <div style={{ marginTop: 10 }}>
-                <div className="label">Setores contemplados</div>
-                <div className="chips">
-                  {setores.map((s) => (
-                    <span key={s} className="chip">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* PARTICIPANTES */}

@@ -25,6 +25,7 @@ export default function NovoTreinamento() {
     processo: "",
     tema: "",
     soc: "",
+    liderResponsavelOpsId: "",
     setores: [],
     participantes: [],
   });
@@ -170,7 +171,7 @@ export default function NovoTreinamento() {
 
   });
 
-  const isFormValid = form.dataTreinamento && form.tema && form.processo && form.participantes.length > 0;
+  const isFormValid = form.dataTreinamento && form.tema && form.processo && form.liderResponsavelOpsId && form.participantes.length > 0;
 
   /* ================= RENDER ================= */
   return (
@@ -304,6 +305,40 @@ export default function NovoTreinamento() {
                         {e.stationCode || e.codigo} — {e.nomeEstacao}
                       </option>
                     ))}
+                  </select>
+                </div>
+
+                {/* LÍDER RESPONSÁVEL */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-xs lg:text-sm font-medium text-white/70">
+                    <Users size={14} className="text-white/40" />
+                    Líder Responsável *
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 lg:py-3.5 bg-black/30 border border-white/10 rounded-xl lg:rounded-2xl text-white text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-[#FA4C00]/50 focus:border-[#FA4C00]/50 transition-all appearance-none cursor-pointer"
+                    value={form.liderResponsavelOpsId}
+                    onChange={(e) =>
+                      setForm({ ...form, liderResponsavelOpsId: e.target.value })
+                    }
+                  >
+                    <option value="" className="bg-[#1A1A1C]">Selecione o líder</option>
+                    {colaboradores
+                      .filter((c) => {
+                        const cargo = (c.cargo?.nomeCargo || "").toLowerCase();
+                        return (
+                          cargo.includes("lider") ||
+                          cargo.includes("líder") ||
+                          cargo.includes("supervisor") ||
+                          cargo.includes("gerente") ||
+                          cargo.includes("coordenador") ||
+                          cargo.includes("coordenação")
+                        );
+                      })
+                      .map((c) => (
+                        <option key={c.opsId} value={c.opsId} className="bg-[#1A1A1C]">
+                          {c.nomeCompleto} — {c.cargo?.nomeCargo}
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>

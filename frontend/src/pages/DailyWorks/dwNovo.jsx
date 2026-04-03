@@ -7,15 +7,6 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import api from "../../services/api";
 
-/* ==============================
-   EMPRESAS FIXAS
-============================== */
-const EMPRESAS = [
-  { idEmpresa: 12, nome: "SRM" },
-  { idEmpresa: 13, nome: "Fenix" },
-  { idEmpresa: 14, nome: "Horeca" },
-];
-
 export default function DwNovoPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,15 +15,40 @@ export default function DwNovoPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loadingDw, setLoadingDw] = useState(false);
+  const [empresas, setEmpresas] = useState([]);
 
   const [form, setForm] = useState({
     data: editData?.data || "",
     idTurno: editData?.turno || "",
     observacaoReal: "",
     observacaoPlanejado: "",
-    real: { 12: "", 13: "", 14: "" },
-    planejado: { 12: "", 13: "", 14: "" },
+    real: {},
+    planejado: {},
   });
+
+  /* ==============================
+     CARREGAR EMPRESAS DA API
+  ===============================*/
+  useEffect(() => {
+    api.get("/empresas")
+      .then((res) => {
+        const lista = res.data.data || res.data || [];
+        setEmpresas(lista);
+        // inicializa form com os IDs reais do banco
+        const initReal = {};
+        const initPlanejado = {};
+        lista.forEach((e) => {
+          initReal[e.idEmpresa] = "";
+          initPlanejado[e.idEmpresa] = "";
+        });
+        setForm((prev) => ({
+          ...prev,
+          real: initReal,
+          planejado: initPlanejado,
+        }));
+      })
+      .catch((err) => console.error("Erro ao carregar empresas:", err));
+  }, []);
 
   /* ==============================
      CARREGAR DW EXISTENTE (EDIÇÃO)
@@ -56,28 +72,30 @@ export default function DwNovoPage() {
         const registrosReal = resReal.data.data || [];
         const registrosPlanejado = resPlanejado.data.data || [];
 
-        const novoReal = { 12: "", 13: "", 14: "" };
-        const novoPlanejado = { 12: "", 13: "", 14: "" };
         let obsReal = "";
         let obsPlanejado = "";
 
-        registrosReal.forEach((r) => {
-          novoReal[r.idEmpresa] = r.quantidade;
-          if (r.observacao) obsReal = r.observacao;
-        });
+        setForm((prev) => {
+          const novoReal = { ...prev.real };
+          const novoPlanejado = { ...prev.planejado };
 
-        registrosPlanejado.forEach((r) => {
-          novoPlanejado[r.idEmpresa] = r.quantidade;
-          if (r.observacao) obsPlanejado = r.observacao;
-        });
+          registrosReal.forEach((r) => {
+            novoReal[r.idEmpresa] = r.quantidade;
+            if (r.observacao) obsReal = r.observacao;
+          });
+          registrosPlanejado.forEach((r) => {
+            novoPlanejado[r.idEmpresa] = r.quantidade;
+            if (r.observacao) obsPlanejado = r.observacao;
+          });
 
-        setForm((prev) => ({
-          ...prev,
-          real: novoReal,
-          planejado: novoPlanejado,
-          observacaoReal: obsReal,
-          observacaoPlanejado: obsPlanejado,
-        }));
+          return {
+            ...prev,
+            real: novoReal,
+            planejado: novoPlanejado,
+            observacaoReal: obsReal,
+            observacaoPlanejado: obsPlanejado,
+          };
+        });
       } catch (error) {
         console.error("Erro ao carregar DW:", error);
       } finally {
@@ -108,14 +126,14 @@ export default function DwNovoPage() {
       return;
     }
 
-    const valoresReal = Object.values(form.real);
-    const valoresPlanejado = Object.values(form.planejado);
+    const valoresReal = empresas.map((e) => form.real[e.idEmpresa]);
+    const valoresPlanejado = empresas.map((e) => form.planejado[e.idEmpresa]);
 
-    if (valoresReal.some((v) => v === "")) {
+    if (valoresReal.some((v) => v === "" || v === undefined)) {
       alert("Informe a quantidade Real de todas as empresas");
       return;
     }
-    if (valoresPlanejado.some((v) => v === "")) {
+    if (valoresPlanejado.some((v) => v === "" || v === undefined)) {
       alert("Informe a quantidade Planejada de todas as empresas");
       return;
     }
@@ -125,22 +143,22 @@ export default function DwNovoPage() {
 
       await Promise.all([
         // Salva Real
-        ...EMPRESAS.map((e) =>
+        ...empresas.map((e) =>
           api.post("/dw/real", {
             data: form.data,
             idTurno: Number(form.idTurno),
             idEmpresa: e.idEmpresa,
-            quantidade: Number(form.real[e.idEmpresa]),
+            quantidade: Number(form.real[e.idEmpresa] || 0),
             observacao: form.observacaoReal || null,
           })
         ),
         // Salva Planejado
-        ...EMPRESAS.map((e) =>
+        ...empresas.map((e) =>
           api.post("/dw/planejado", {
             data: form.data,
             idTurno: Number(form.idTurno),
             idEmpresa: e.idEmpresa,
-            quantidade: Number(form.planejado[e.idEmpresa]),
+            quantidade: Number(form.planejado[e.idEmpresa] || 0),
             observacao: form.observacaoPlanejado || null,
           })
         ),
@@ -228,13 +246,13 @@ export default function DwNovoPage() {
 
           {/* ================= PLANEJADO ================= */}
           <Section title="Quantidade Planejada por Empresa">
-            {EMPRESAS.map((e) => (
+            {empresas.map((e) => (
               <Input
                 key={e.idEmpresa}
                 type="number"
                 min="0"
-                label={`${e.nome} *`}
-                value={form.planejado[e.idEmpresa]}
+                label={`${e.razaoSocial} *`}
+                value={form.planejado[e.idEmpresa] ?? ""}
                 onChange={(ev) => handlePlanejado(e.idEmpresa, ev.target.value)}
               />
             ))}
@@ -249,13 +267,13 @@ export default function DwNovoPage() {
 
           {/* ================= REAL ================= */}
           <Section title="Quantidade Real por Empresa">
-            {EMPRESAS.map((e) => (
+            {empresas.map((e) => (
               <Input
                 key={e.idEmpresa}
                 type="number"
                 min="0"
-                label={`${e.nome} *`}
-                value={form.real[e.idEmpresa]}
+                label={`${e.razaoSocial} *`}
+                value={form.real[e.idEmpresa] ?? ""}
                 onChange={(ev) => handleReal(e.idEmpresa, ev.target.value)}
               />
             ))}

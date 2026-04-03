@@ -7,26 +7,25 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import api from "../../services/api";
 
-/* ==============================
-   EMPRESAS FIXAS (OFICIAIS DW)
-============================== */
-const EMPRESAS_FIXAS = [
-  { id: 12, nome: "SRM" },
-  { id: 13, nome: "Fenix" },
-  { id: 14, nome: "Horeca" },
-];
-
 export default function DwListPage() {
   const navigate = useNavigate();
 
   const [lista, setLista] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [empresas, setEmpresas] = useState([]);
 
   const [data, setData] = useState("");
   const [turno, setTurno] = useState("TODOS");
   const [empresa, setEmpresa] = useState("TODAS");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Carrega empresas do banco uma única vez
+  useEffect(() => {
+    api.get("/empresas")
+      .then((res) => setEmpresas(res.data.data || res.data || []))
+      .catch(() => {});
+  }, []);
 
   function handleEditar(row) {
 
@@ -117,9 +116,9 @@ export default function DwListPage() {
                 className="bg-[#1A1A1C] text-sm px-4 py-2 rounded-xl text-[#BFBFC3] outline-none hover:bg-[#2A2A2C]"
               >
                 <option value="TODAS">Empresas</option>
-                {EMPRESAS_FIXAS.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.nome}
+                {empresas.map((e) => (
+                  <option key={e.idEmpresa} value={e.idEmpresa}>
+                    {e.razaoSocial}
                   </option>
                 ))}
               </select>
@@ -157,9 +156,9 @@ export default function DwListPage() {
                   <tr>
                     <th className="px-6 py-4 text-left">Data</th>
 
-                    {EMPRESAS_FIXAS.map((e) => (
-                      <th key={e.id} className="px-6 py-4 text-center">
-                        {e.nome}
+                    {empresas.map((e) => (
+                      <th key={e.idEmpresa} className="px-6 py-4 text-center">
+                        {e.razaoSocial}
                       </th>
                     ))}
 
@@ -186,12 +185,12 @@ export default function DwListPage() {
                       >
                         <td className="px-6 py-4">{row.data}</td>
 
-                        {EMPRESAS_FIXAS.map((emp) => (
+                        {empresas.map((emp) => (
                           <td
-                            key={emp.id}
+                            key={emp.idEmpresa}
                             className="px-6 py-4 text-center font-semibold"
                           >
-                            {row.empresas?.[emp.nome] || 0}
+                            {row.empresas?.[emp.razaoSocial] || 0}
                           </td>
                         ))}
 

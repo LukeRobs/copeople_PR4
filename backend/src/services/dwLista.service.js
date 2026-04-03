@@ -1,29 +1,37 @@
 const { prisma } = require("../config/database");
 
-/* ==========================
-   EMPRESAS FIXAS DO DW
-========================== */
-const EMPRESAS_FIXAS = {
-  12: "SRM",
-  13: "Fenix",
-  14: "Horeca",
-};
-
-const IDS_EMPRESAS_FIXAS = Object.keys(EMPRESAS_FIXAS).map(Number);
-
 const buscarDwLista = async ({ data, idTurno, idEmpresa }) => {
-  const whereBase = {
-    idEmpresa: { in: IDS_EMPRESAS_FIXAS },
-  };
+
+  /* ==========================
+     1. EMPRESAS DO BANCO
+  ========================== */
+  const empresasDB = await prisma.empresa.findMany({
+    where: { ativo: true },
+    select: { idEmpresa: true, razaoSocial: true },
+    orderBy: { razaoSocial: "asc" },
+  });
+
+  const empresaMap = {}; // idEmpresa → razaoSocial
+  empresasDB.forEach((e) => { empresaMap[e.idEmpresa] = e.razaoSocial; });
+
+  const idsEmpresas = empresasDB.map((e) => e.idEmpresa);
+
+  /* ==========================
+     2. WHERE BASE
+  ========================== */
+  const whereBase = {};
 
   if (data) whereBase.data = new Date(data);
   if (idTurno) whereBase.idTurno = Number(idTurno);
-  if (idEmpresa && IDS_EMPRESAS_FIXAS.includes(Number(idEmpresa))) {
+
+  if (idEmpresa && idsEmpresas.includes(Number(idEmpresa))) {
     whereBase.idEmpresa = Number(idEmpresa);
+  } else {
+    whereBase.idEmpresa = { in: idsEmpresas };
   }
 
   /* ==========================
-     1️⃣ BUSCAR DW REAL E PLANEJADO
+     3. BUSCAR REAL E PLANEJADO
   ========================== */
   const [dwReais, dwPlanejados] = await Promise.all([
     prisma.dwReal.findMany({
@@ -37,12 +45,17 @@ const buscarDwLista = async ({ data, idTurno, idEmpresa }) => {
   ]);
 
   /* ==========================
-     2️⃣ AGRUPAR POR DATA + TURNO
+     4. AGRUPAR POR DATA + TURNO
   ========================== */
   const agrupado = {};
   const turnoMap = { 1: "T1", 2: "T2", 3: "T3" };
 
-  // Inicializa grupos a partir do Real
+  const initEmpresas = () => {
+    const obj = {};
+    empresasDB.forEach((e) => { obj[e.razaoSocial] = 0; });
+    return obj;
+  };
+
   for (const r of dwReais) {
     const dataISO = r.data.toISOString().slice(0, 10);
     const chave = `${dataISO}_${r.idTurno}`;
@@ -50,32 +63,30 @@ const buscarDwLista = async ({ data, idTurno, idEmpresa }) => {
     if (!agrupado[chave]) {
       agrupado[chave] = {
         data: dataISO,
-        turno: turnoMap[r.idTurno],
+        turno: turnoMap[r.idTurno] || `T${r.idTurno}`,
         planejado: 0,
-        empresas: { SRM: 0, Fenix: 0, Horeca: 0 },
+        empresas: initEmpresas(),
         totalReal: 0,
       };
     }
 
-    const nomeEmpresa = EMPRESAS_FIXAS[r.idEmpresa];
+    const nomeEmpresa = empresaMap[r.idEmpresa];
     if (!nomeEmpresa) continue;
 
-    agrupado[chave].empresas[nomeEmpresa] += r.quantidade;
+    agrupado[chave].empresas[nomeEmpresa] = (agrupado[chave].empresas[nomeEmpresa] || 0) + r.quantidade;
     agrupado[chave].totalReal += r.quantidade;
   }
 
-  // Soma o planejado por empresa no grupo correspondente
   for (const p of dwPlanejados) {
     const dataISO = p.data.toISOString().slice(0, 10);
     const chave = `${dataISO}_${p.idTurno}`;
 
-    // cria grupo mesmo se não houver real ainda
     if (!agrupado[chave]) {
       agrupado[chave] = {
         data: dataISO,
-        turno: turnoMap[p.idTurno],
+        turno: turnoMap[p.idTurno] || `T${p.idTurno}`,
         planejado: 0,
-        empresas: { SRM: 0, Fenix: 0, Horeca: 0 },
+        empresas: initEmpresas(),
         totalReal: 0,
       };
     }

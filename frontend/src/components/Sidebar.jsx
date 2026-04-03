@@ -514,7 +514,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <p className="text-xs text-[#BFBFC3]">
               Desenvolvido por:{" "}
               <span className="text-[#FA4C00] font-medium">
-                Lucas e Thiago
+                Lucas e T.Feitoza
               </span>
             </p>
           </div>

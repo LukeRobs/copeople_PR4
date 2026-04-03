@@ -17,10 +17,10 @@ exports.createTreinamento = async (req, res) => {
       participantes = [],
     } = req.body;
 
-    if (!dataTreinamento || !processo || !tema || !soc) {
+    if (!dataTreinamento || !processo || !tema) {
       return res.status(400).json({
         success: false,
-        message: "Campos obrigatórios não informados",
+        message: "Campos obrigatórios não informados (data, processo, tema)",
       });
     }
 
@@ -29,7 +29,7 @@ exports.createTreinamento = async (req, res) => {
     if (!instrutorOpsId) {
       return res.status(400).json({
         success: false,
-        message: "Instrutor deve ser informado",
+        message: "Líder responsável deve ser informado",
       });
     }
 
@@ -41,7 +41,7 @@ exports.createTreinamento = async (req, res) => {
 
         processo,
         tema,
-        soc,
+        soc: soc || "SPR4",
 
         liderResponsavel: {
           connect: { opsId: instrutorOpsId },
@@ -78,7 +78,11 @@ exports.createTreinamento = async (req, res) => {
         participantes: {
           include: {
             colaborador: {
-              select: { nomeCompleto: true, cpf: true },
+              select: {
+                nomeCompleto: true,
+                cpf: true,
+                setor: { select: { nomeSetor: true } },
+              },
             },
           },
         },
@@ -124,7 +128,11 @@ exports.listTreinamentos = async (req, res) => {
         participantes: {
           include: {
             colaborador: {
-              select: { nomeCompleto: true, cpf: true },
+              select: {
+                nomeCompleto: true,
+                cpf: true,
+                setor: { select: { nomeSetor: true } },
+              },
             },
           },
         },

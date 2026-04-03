@@ -129,7 +129,7 @@ export function printAtaTreinamento(treinamento) {
   <div class="meta">
     Data do treinamento: <b>${fmtDateBR(treinamento.dataTreinamento)}</b><br/>
     SOC: <b>${treinamento.soc}</b> • Processo: <b>${treinamento.processo}</b><br/>
-    Gerado em: ${fmtDateBR(new Date())} às ${fmtTimeBR(new Date())}
+    Hora do treinamento: <b>${fmtTimeBR(new Date())}</b>
   </div>
 
   <div class="grid">
@@ -150,10 +150,6 @@ export function printAtaTreinamento(treinamento) {
       <div class="value">${setores || "-"}</div>
     </div>
 
-    <div class="box">
-      <div class="label">Status</div>
-      <div class="value">${treinamento.status}</div>
-    </div>
   </div>
 
   <h3 style="margin-top:20px">Participantes</h3>
