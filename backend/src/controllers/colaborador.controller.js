@@ -13,6 +13,7 @@ const {
   errorResponse,
 } = require("../utils/response");
 const { gerarDSRBackfillColaborador, gerarDSRFuturoColaborador } = require("../services/dsrBackfill.service");
+const { gerarOnboardingParaColaborador } = require("../services/onboardingAutomatico.service");
 
 /* ================= CONSTANTES ================= */
 const HORARIOS_PERMITIDOS = ["05:25", "13:20", "21:00"];
@@ -574,6 +575,15 @@ const createColaborador = async (req, res) => {
       return novo;
     });
 
+    // Gera ON automático no dia da admissão e no seguinte (fora da transaction)
+    try {
+      const dataAdm = colaborador.dataAdmissao || new Date();
+      await gerarOnboardingParaColaborador(colaborador.opsId, dataAdm);
+    } catch (onbErr) {
+      console.error("⚠️ Onboarding automático falhou:", onbErr.message);
+      // não quebra o fluxo
+    }
+
     return createdResponse(
       res,
       colaborador,
@@ -650,6 +660,51 @@ const updateColaborador = async (req, res) => {
 
     if (idLider !== undefined) {
       data.idLider = idLider || null;
+    }
+
+    /* =============================
+       DATA ADMISSÃO / JORNADA
+    ============================== */
+    if (dataAdmissao !== undefined) {
+      data.dataAdmissao = dataAdmissao
+        ? new Date(`${dataAdmissao}T00:00:00`)
+        : null;
+    }
+
+    if (horarioInicioJornada !== undefined && horarioInicioJornada) {
+      data.horarioInicioJornada = new Date(`1970-01-01T${horarioInicioJornada}:00Z`);
+    }
+
+    /* =============================
+       DESLIGAMENTO
+    ============================== */
+    if (dataDesligamento !== undefined) {
+      data.dataDesligamento = dataDesligamento
+        ? new Date(`${dataDesligamento}T00:00:00`)
+        : null;
+    }
+
+    if (motivoDesligamento !== undefined) {
+      data.motivoDesligamento = motivoDesligamento || null;
+    }
+
+    if (tipoDesligamento !== undefined) {
+      data.tipoDesligamento = tipoDesligamento || null;
+    }
+
+    /* =============================
+       STATUS TEMPORÁRIO (FÉRIAS/AFASTADO)
+    ============================== */
+    if (dataInicioStatus !== undefined) {
+      data.dataInicioStatus = dataInicioStatus
+        ? new Date(`${dataInicioStatus}T00:00:00`)
+        : null;
+    }
+
+    if (dataFimStatus !== undefined) {
+      data.dataFimStatus = dataFimStatus
+        ? new Date(`${dataFimStatus}T00:00:00`)
+        : null;
     }
 
     /* =============================

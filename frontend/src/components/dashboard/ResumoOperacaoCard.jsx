@@ -1,76 +1,42 @@
+import { useContext } from "react";
 import { TrendingUp } from "lucide-react";
+import { ThemeContext } from "../../context/ThemeContext";
 
-export default function ResumoOperacaoCard({
-  title,
-  data = [],
-  labelKey,
-}) {
+export default function ResumoOperacaoCard({ title, data = [], labelKey }) {
+  const { isDark } = useContext(ThemeContext);
+
+  const cardBg    = isDark ? "#1A1A1C" : "#FFFFFF";
+  const border    = isDark ? "#2A2A2C" : "#E5E7EB";
+  const iconBg    = isDark ? "#2A2A2C" : "#F3F4F6";
+  const textMain  = isDark ? "#E5E5E5" : "#111827";
+  const textMuted = isDark ? "#BFBFC3" : "#6B7280";
+
   return (
-    <div
-      className="
-        bg-[#1A1A1C]
-        border border-[#2A2A2C]
-        rounded-2xl
-        p-5
-        space-y-5
-        min-h-[220px]
-        transition
-        hover:border-[#3A3A3C]
-      "
-    >
-      {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-base sm:text-lg font-semibold text-white">
-          {title}
-        </h3>
-
-        <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#2A2A2C]">
-          <TrendingUp size={16} className="text-[#FA4C00]" />
+    <div style={{ background: cardBg, border: `1px solid ${border}`, borderRadius: 16, padding: 20, minHeight: 220, display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <h3 style={{ fontSize: 16, fontWeight: 600, color: textMain, margin: 0 }}>{title}</h3>
+        <div style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, background: iconBg }}>
+          <TrendingUp size={16} color="#FA4C00" />
         </div>
       </div>
 
-      {/* CONTENT */}
       {data.length === 0 ? (
-        <div className="text-sm text-[#BFBFC3]">
-          Nenhum dado no período
-        </div>
+        <div style={{ fontSize: 13, color: textMuted }}>Nenhum dado no período</div>
       ) : (
-        <div className="space-y-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {data.map((item, idx) => {
             const total = item.totalColaboradores || item.total || 0;
-            const abs = Number(item.absenteismo ?? 0);
-
-            const color =
-              abs > 10
-                ? "#FF453A"
-                : abs > 5
-                ? "#FF9F0A"
-                : "#34C759";
+            const abs   = Number(item.absenteismo ?? 0);
+            const color = abs > 10 ? "#FF453A" : abs > 5 ? "#FF9F0A" : "#34C759";
 
             return (
-              <div
-                key={idx}
-                className="
-                  flex items-center justify-between
-                  gap-4
-                  text-sm
-                "
-              >
-                <div className="truncate max-w-[65%] text-[#E5E5E5]">
+              <div key={idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, fontSize: 13 }}>
+                <div style={{ color: textMain, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "65%" }}>
                   {item[labelKey]}
                 </div>
-
-                <div className="flex items-center gap-3 min-w-[110px] justify-end">
-                  <span className="text-[#BFBFC3]">
-                    {total}
-                  </span>
-
-                  <span
-                    className="font-semibold"
-                    style={{ color }}
-                  >
-                    {abs.toFixed(2)}%
-                  </span>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 110, justifyContent: "flex-end" }}>
+                  <span style={{ color: textMuted }}>{total}</span>
+                  <span style={{ fontWeight: 600, color }}>{abs.toFixed(2)}%</span>
                 </div>
               </div>
             );

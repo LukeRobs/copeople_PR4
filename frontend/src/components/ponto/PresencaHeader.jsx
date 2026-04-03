@@ -1,36 +1,59 @@
+import { useContext } from "react";
+import { ThemeContext } from "../../context/ThemeContext";
+
 export default function PresencaHeader({ dias = [], ano, mes }) {
+  const { isDark } = useContext(ThemeContext);
+
+  const bg       = isDark ? "#1A1A1C" : "#FFFFFF";
+  const border   = isDark ? "#2A2A2C" : "#E5E7EB";
+  const textNorm = isDark ? "#BFBFC3" : "#6B7280";
+  const bgWeekend = isDark ? "#141416" : "#FFF7ED";
 
   function isWeekend(dia) {
     if (!ano || !mes) return false;
-
     const date = new Date(ano, mes - 1, dia);
     const day = date.getDay();
-
     return day === 0 || day === 6;
   }
 
   return (
-    <thead className="sticky top-0 z-30 bg-[#1A1A1C]">
+    <thead style={{ position: "sticky", top: 0, zIndex: 30, background: bg }}>
       <tr>
-        <th className="sticky left-0 z-40 bg-[#1A1A1C] px-4 py-3 border-r border-[#2A2A2C] text-left min-w-[220px] sm:min-w-[260px]">
+        <th
+          style={{
+            position: "sticky",
+            left: 0,
+            zIndex: 40,
+            background: bg,
+            padding: "12px 16px",
+            borderRight: `1px solid ${border}`,
+            textAlign: "left",
+            minWidth: 220,
+            color: textNorm,
+            fontSize: 12,
+            fontWeight: 600,
+            borderBottom: `1px solid ${border}`,
+          }}
+        >
           Colaborador
         </th>
 
         {dias.map((dia) => {
           const weekend = isWeekend(dia);
-
           return (
             <th
               key={`dia-${dia}`}
-              className={`
-                px-2 py-3 text-center border-r border-[#2A2A2C] text-xs min-w-12 sm:min-w-14
-                bg-[#1A1A1C]
-                ${
-                  weekend
-                    ? "bg-[#141416] text-[#FA4C00] font-semibold"
-                    : "text-[#BFBFC3]"
-                }
-              `}
+              style={{
+                padding: "12px 8px",
+                textAlign: "center",
+                borderRight: `1px solid ${border}`,
+                borderBottom: `1px solid ${border}`,
+                fontSize: 12,
+                minWidth: 48,
+                background: weekend ? bgWeekend : bg,
+                color: weekend ? "#FA4C00" : textNorm,
+                fontWeight: weekend ? 700 : 400,
+              }}
             >
               {dia}
             </th>

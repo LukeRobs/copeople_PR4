@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import LoadingScreen from "../../components/LoadingScreen";
 import AtestadoCard from "../../components/AtestadoCard";
 import { AtestadosAPI } from "../../services/atestados";
 import api from "../../services/api";
+import { ThemeContext } from "../../context/ThemeContext";
 
 export default function AtestadosPage() {
   const navigate = useNavigate();
@@ -19,6 +20,16 @@ export default function AtestadosPage() {
   /* 🔎 FILTROS */
   const [filtroData, setFiltroData] = useState("");
   const [filtroNome, setFiltroNome] = useState("");
+
+  const { isDark } = useContext(ThemeContext);
+
+  /* ── theme tokens ── */
+  const bg           = isDark ? "#0D0D0D" : "#F3F4F6";
+  const textMain     = isDark ? "#FFFFFF"  : "#111827";
+  const labelColor   = isDark ? "#BFBFC3"  : "#6B7280";
+  const filterBg     = isDark ? "#1A1A1C"  : "#FFFFFF";
+  const filterBorder = isDark ? "#2A2A2C"  : "#E5E7EB";
+  const inputColor   = isDark ? "#FFFFFF"  : "#111827";
 
   /* ================= LOAD ================= */
   async function load() {
@@ -61,7 +72,7 @@ export default function AtestadosPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white">
+    <div style={{ display: "flex", minHeight: "100vh", background: bg, color: textMain }}>
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -76,21 +87,14 @@ export default function AtestadosPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold">Atestados Médicos</h1>
-              <p className="text-sm text-[#BFBFC3]">
+              <p className="text-sm" style={{ color: labelColor }}>
                 Gestão de afastamentos médicos
               </p>
             </div>
 
             <button
               onClick={() => navigate("/atestados/novo")}
-              className="
-                flex items-center gap-2
-                px-5 py-2.5
-                bg-[#FA4C00]
-                hover:bg-[#ff5a1a]
-                rounded-xl
-                text-sm font-medium
-              "
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#FA4C00] hover:bg-[#ff5a1a] rounded-xl text-sm font-medium text-white"
             >
               <Plus size={16} />
               Novo Atestado
@@ -100,30 +104,43 @@ export default function AtestadosPage() {
           {/* 🔎 FILTROS */}
           <div className="flex flex-wrap items-center gap-3">
             {/* DATA */}
-            <div className="bg-[#1A1A1C] px-4 py-2 rounded-xl">
+            <div
+              style={{ background: filterBg, border: `1px solid ${filterBorder}` }}
+              className="px-4 py-2 rounded-xl"
+            >
               <input
                 type="date"
                 value={filtroData}
                 onChange={(e) => setFiltroData(e.target.value)}
-                className="bg-transparent outline-none text-sm text-white"
+                className="bg-transparent outline-none text-sm"
+                style={{ color: inputColor }}
               />
             </div>
 
             {/* COLABORADOR */}
-            <div className="bg-[#1A1A1C] px-4 py-2 rounded-xl flex items-center gap-2">
+            <div
+              style={{ background: filterBg, border: `1px solid ${filterBorder}` }}
+              className="px-4 py-2 rounded-xl flex items-center gap-2"
+            >
               <Search size={14} className="text-[#6B7280]" />
               <input
                 type="text"
                 placeholder="Buscar colaborador"
                 value={filtroNome}
                 onChange={(e) => setFiltroNome(e.target.value)}
-                className="bg-transparent outline-none text-sm text-white placeholder-[#6B7280]"
+                className="bg-transparent outline-none text-sm placeholder-[#6B7280]"
+                style={{ color: inputColor }}
               />
             </div>
 
             <button
               onClick={load}
-              className="px-4 py-2 rounded-xl bg-[#1A1A1C] hover:bg-[#2A2A2C] text-sm"
+              style={{
+                background: filterBg,
+                border: `1px solid ${filterBorder}`,
+                color: textMain,
+              }}
+              className="px-4 py-2 rounded-xl text-sm transition-opacity hover:opacity-80"
             >
               Filtrar
             </button>
@@ -133,7 +150,7 @@ export default function AtestadosPage() {
           {loading ? (
             <LoadingScreen message="Carregando atestados..." />
           ) : atestados.length === 0 ? (
-            <div className="text-[#BFBFC3]">
+            <div style={{ color: labelColor }}>
               Nenhum atestado médico encontrado
             </div>
           ) : (

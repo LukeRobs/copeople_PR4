@@ -50,26 +50,15 @@ function isoFirstDayOfMonth() {
 
 /* ─── CUSTOM TOOLTIP ─────────────────────────────────────────────── */
 function CustomTooltip({ active, payload, label }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!active || !payload?.length) return null
   return (
-    <div
-      style={{
-        background: "#1A1A1A",
-        border: "1px solid rgba(255,255,255,0.10)",
-        borderRadius: 12,
-        padding: "10px 16px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
-      }}
-    >
-      {label && (
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginBottom: 4 }}>
-          {label}
-        </p>
-      )}
+    <div style={{ background: isDark ? "#1A1A1A" : "#FFFFFF", border: `1px solid ${T.border}`, borderRadius: 12, padding: "10px 16px", boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
+      {label && <p style={{ color: T.textMuted, fontSize: 11, marginBottom: 4 }}>{label}</p>}
       {payload.map((p, i) => (
-        <p key={i} style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: 0 }}>
-          <span style={{ color: p.color || BRAND }}>● </span>
-          {p.value}
+        <p key={i} style={{ color: T.textMain, fontSize: 14, fontWeight: 600, margin: 0 }}>
+          <span style={{ color: p.color || BRAND }}>● </span>{p.value}
         </p>
       ))}
     </div>
@@ -78,15 +67,9 @@ function CustomTooltip({ active, payload, label }) {
 
 /* ─── SKELETON ───────────────────────────────────────────────────── */
 function Skeleton({ style = {} }) {
+  const { isDark } = useContext(ThemeContext)
   return (
-    <div
-      style={{
-        background: "rgba(255,255,255,0.05)",
-        borderRadius: 10,
-        animation: "pulse 1.5s ease-in-out infinite",
-        ...style,
-      }}
-    />
+    <div style={{ background: isDark ? "rgba(255,255,255,0.05)" : "#E5E7EB", borderRadius: 10, animation: "pulse 1.5s ease-in-out infinite", ...style }} />
   )
 }
 
@@ -321,17 +304,10 @@ function DateInput({ label, value, onChange }) {
 
 /* ─── EMPTY STATE ────────────────────────────────────────────────── */
 function Empty() {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: 160,
-        color: "rgba(255,255,255,0.18)",
-        fontSize: 13,
-      }}
-    >
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 160, color: T.textSubtle, fontSize: 13 }}>
       Sem dados no período
     </div>
   )
@@ -339,7 +315,12 @@ function Empty() {
 
 /* ─── CHARTS ─────────────────────────────────────────────────────── */
 function AreaBlock({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!data?.length) return <Empty />
+  const tickColor  = isDark ? "#4B4B4B" : "#9CA3AF"
+  const gridColor  = isDark ? "rgba(255,255,255,0.04)" : "#E5E7EB"
+  const labelColor = isDark ? "rgba(255,255,255,0.55)" : "#6B7280"
   return (
     <ResponsiveContainer width="100%" height={300}>
       <AreaChart data={data} margin={{ top: 26, right: 16, bottom: 0, left: -8 }}>
@@ -349,35 +330,12 @@ function AreaBlock({ data }) {
             <stop offset="95%" stopColor={BRAND} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
-        <XAxis
-          dataKey="data"
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
-          axisLine={false}
-          tickLine={false}
-          tickMargin={8}
-        />
-        <YAxis
-          allowDecimals={false}
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
-          axisLine={false}
-          tickLine={false}
-          width={28}
-        />
-        <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(255,255,255,0.06)", strokeWidth: 1 }} />
-        <Area
-          dataKey="total"
-          stroke={BRAND}
-          strokeWidth={2.5}
-          fill="url(#areaG)"
-          dot={{ fill: BRAND, r: 3, strokeWidth: 0 }}
-          activeDot={{ r: 5, fill: BRAND, strokeWidth: 0 }}
-        >
-          <LabelList
-            dataKey="total"
-            position="top"
-            style={{ fill: "rgba(255,255,255,0.55)", fontSize: 10, fontWeight: 600 }}
-          />
+        <CartesianGrid stroke={gridColor} vertical={false} />
+        <XAxis dataKey="data" tick={{ fill: tickColor, fontSize: 11 }} axisLine={false} tickLine={false} tickMargin={8} />
+        <YAxis allowDecimals={false} tick={{ fill: tickColor, fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
+        <Tooltip content={<CustomTooltip />} cursor={{ stroke: T.border, strokeWidth: 1 }} />
+        <Area dataKey="total" stroke={BRAND} strokeWidth={2.5} fill="url(#areaG)" dot={{ fill: BRAND, r: 3, strokeWidth: 0 }} activeDot={{ r: 5, fill: BRAND, strokeWidth: 0 }}>
+          <LabelList dataKey="total" position="top" style={{ fill: labelColor, fontSize: 10, fontWeight: 600 }} />
         </Area>
       </AreaChart>
     </ResponsiveContainer>
@@ -385,30 +343,22 @@ function AreaBlock({ data }) {
 }
 
 function BarBlock({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!data?.length) return <Empty />
-  const sorted = [...data].sort((a, b) => b.value - a.value)
+  const sorted     = [...data].sort((a, b) => b.value - a.value)
+  const tickColor  = isDark ? "#4B4B4B" : "#9CA3AF"
+  const gridColor  = isDark ? "rgba(255,255,255,0.04)" : "#E5E7EB"
+  const labelColor = isDark ? "rgba(255,255,255,0.5)" : "#374151"
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={sorted} margin={{ top: 22, right: 16, bottom: 0, left: -12 }}>
-        <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
-        <XAxis
-          dataKey="name"
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
-          axisLine={false}
-          tickLine={false}
-          tickMargin={8}
-          tickFormatter={(v) => (v?.length > 10 ? v.slice(0, 10) + "…" : v)}
-        />
-        <YAxis
-          allowDecimals={false}
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
-          axisLine={false}
-          tickLine={false}
-          width={26}
-        />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+        <CartesianGrid stroke={gridColor} vertical={false} />
+        <XAxis dataKey="name" tick={{ fill: tickColor, fontSize: 11 }} axisLine={false} tickLine={false} tickMargin={8} tickFormatter={(v) => (v?.length > 10 ? v.slice(0, 10) + "…" : v)} />
+        <YAxis allowDecimals={false} tick={{ fill: tickColor, fontSize: 11 }} axisLine={false} tickLine={false} width={26} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "#F3F4F6" }} />
         <Bar dataKey="value" fill={BRAND} radius={[6, 6, 0, 0]} maxBarSize={44}>
-          <LabelList dataKey="value" position="top" style={{ fill: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600 }} />
+          <LabelList dataKey="value" position="top" style={{ fill: labelColor, fontSize: 11, fontWeight: 600 }} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
@@ -416,38 +366,25 @@ function BarBlock({ data }) {
 }
 
 function BarBlockH({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!data?.length) return <Empty />
-  const fmt = (n = "") => {
-    const p = n.split(" ")
-    return p.length >= 2 ? `${p[0]} ${p[1]}` : n
-  }
-  const sorted = [...data].sort((a, b) => b.value - a.value)
-  const h = Math.max(280, sorted.length * 38)
+  const fmt = (n = "") => { const p = n.split(" "); return p.length >= 2 ? `${p[0]} ${p[1]}` : n }
+  const sorted     = [...data].sort((a, b) => b.value - a.value)
+  const h          = Math.max(280, sorted.length * 38)
+  const tickColor  = isDark ? "#4B4B4B" : "#9CA3AF"
+  const yTickColor = isDark ? "#888" : "#6B7280"
+  const gridColor  = isDark ? "rgba(255,255,255,0.04)" : "#E5E7EB"
+  const labelColor = isDark ? "rgba(255,255,255,0.45)" : "#374151"
   return (
     <ResponsiveContainer width="100%" height={h}>
-      <BarChart
-        layout="vertical"
-        data={sorted.map((d) => ({ ...d, name: fmt(d.name) }))}
-        margin={{ top: 0, right: 36, bottom: 0, left: 0 }}
-      >
-        <CartesianGrid stroke="rgba(255,255,255,0.04)" horizontal={false} />
-        <XAxis
-          type="number"
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          dataKey="name"
-          type="category"
-          tick={{ fill: "#888", fontSize: 12 }}
-          axisLine={false}
-          tickLine={false}
-          width={96}
-        />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+      <BarChart layout="vertical" data={sorted.map((d) => ({ ...d, name: fmt(d.name) }))} margin={{ top: 0, right: 36, bottom: 0, left: 0 }}>
+        <CartesianGrid stroke={gridColor} horizontal={false} />
+        <XAxis type="number" tick={{ fill: tickColor, fontSize: 11 }} axisLine={false} tickLine={false} />
+        <YAxis dataKey="name" type="category" tick={{ fill: yTickColor, fontSize: 12 }} axisLine={false} tickLine={false} width={96} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "#F3F4F6" }} />
         <Bar dataKey="value" fill={BRAND} radius={[0, 6, 6, 0]} maxBarSize={18}>
-          <LabelList dataKey="value" position="right" style={{ fill: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600 }} />
+          <LabelList dataKey="value" position="right" style={{ fill: labelColor, fontSize: 11, fontWeight: 600 }} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
@@ -455,6 +392,8 @@ function BarBlockH({ data }) {
 }
 
 function PieBlock({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!data?.length) return <Empty />
   const total = data.reduce((a, b) => a + b.value, 0)
   return (
@@ -489,10 +428,8 @@ function PieBlock({ data }) {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: 0, lineHeight: 1 }}>
-            {total}
-          </p>
-          <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", margin: "3px 0 0" }}>total</p>
+          <p style={{ fontSize: 24, fontWeight: 800, color: T.textMain, margin: 0, lineHeight: 1 }}>{total}</p>
+          <p style={{ fontSize: 10, color: T.textSubtle, margin: "3px 0 0" }}>total</p>
         </div>
       </div>
       {/* legend */}
@@ -501,20 +438,10 @@ function PieBlock({ data }) {
           const pct = total > 0 ? Math.round((d.value / total) * 100) : 0
           return (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: CHART_COLORS[i % CHART_COLORS.length],
-                  flexShrink: 0,
-                }}
-              />
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>{d.name}</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: CHART_COLORS[i % CHART_COLORS.length] }}>
-                {d.value}
-              </span>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.30)" }}>({pct}%)</span>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: CHART_COLORS[i % CHART_COLORS.length], flexShrink: 0 }} />
+              <span style={{ fontSize: 11, color: T.textMuted }}>{d.name}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: CHART_COLORS[i % CHART_COLORS.length] }}>{d.value}</span>
+              <span style={{ fontSize: 10, color: T.textSubtle }}>({pct}%)</span>
             </div>
           )
         })}
@@ -581,6 +508,8 @@ function IconDownload({ s = 16 }) {
 
 function AbsenceTable({ data, loading }) {
   const { user } = useContext(AuthContext)
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const canExport = user?.email?.toLowerCase() === "alysson.nascimento@shopee.com"
   const [search, setSearch] = useState("")
 
@@ -626,17 +555,7 @@ function AbsenceTable({ data, loading }) {
       {/* search + export */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
       <div style={{ position: "relative", maxWidth: 300, flex: 1 }}>
-        <div
-          style={{
-            position: "absolute",
-            left: 12,
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: "rgba(255,255,255,0.25)",
-            pointerEvents: "none",
-            display: "flex",
-          }}
-        >
+        <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.textSubtle, pointerEvents: "none", display: "flex" }}>
           <IconSearch />
         </div>
         <input
@@ -644,46 +563,20 @@ function AbsenceTable({ data, loading }) {
           placeholder="Buscar por nome, setor, empresa…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{
-            width: "100%",
-            background: "#1A1A1A",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "#fff",
-            fontSize: 13,
-            borderRadius: 12,
-            padding: "9px 14px 9px 38px",
-            outline: "none",
-            boxSizing: "border-box",
-          }}
+          style={{ width: "100%", background: T.card, border: `1px solid ${T.border}`, color: T.textMain, fontSize: 13, borderRadius: 12, padding: "9px 14px 9px 38px", outline: "none", boxSizing: "border-box" }}
           onFocus={(e) => (e.target.style.borderColor = "rgba(250,76,0,0.45)")}
-          onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
+          onBlur={(e) => (e.target.style.borderColor = T.border)}
         />
       </div>
       {canExport && (
-        <button
-          onClick={exportCSV}
-        disabled={loading || filtered.length === 0}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "9px 14px",
-          borderRadius: 12,
-          border: "1px solid rgba(255,255,255,0.08)",
-          background: "#1A1A1A",
-          color: loading || filtered.length === 0 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.70)",
-          fontSize: 13,
-          fontWeight: 500,
-          cursor: loading || filtered.length === 0 ? "not-allowed" : "pointer",
-          whiteSpace: "nowrap",
-          transition: "border-color 0.15s, color 0.15s",
-        }}
-        onMouseEnter={(e) => { if (!loading && filtered.length > 0) { e.currentTarget.style.borderColor = "rgba(250,76,0,0.45)"; e.currentTarget.style.color = "#fff" } }}
-        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = loading || filtered.length === 0 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.70)" }}
-      >
-        <IconDownload />
-        Exportar CSV
-      </button>
+        <button onClick={exportCSV} disabled={loading || filtered.length === 0}
+          style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 12, border: `1px solid ${T.border}`, background: T.card, color: loading || filtered.length === 0 ? T.textSubtle : T.textMuted, fontSize: 13, fontWeight: 500, cursor: loading || filtered.length === 0 ? "not-allowed" : "pointer", whiteSpace: "nowrap", transition: "border-color 0.15s, color 0.15s" }}
+          onMouseEnter={(e) => { if (!loading && filtered.length > 0) { e.currentTarget.style.borderColor = "rgba(250,76,0,0.45)"; e.currentTarget.style.color = T.textMain } }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = loading || filtered.length === 0 ? T.textSubtle : T.textMuted }}
+        >
+          <IconDownload />
+          Exportar CSV
+        </button>
       )}
       </div>
 
@@ -692,12 +585,12 @@ function AbsenceTable({ data, loading }) {
         style={{
           overflowX: "auto",
           borderRadius: 14,
-          border: "1px solid rgba(255,255,255,0.06)",
+          border: `1px solid ${T.border}`,
         }}
       >
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700, fontSize: 13 }}>
           <thead>
-            <tr style={{ background: "#0D0D0D", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <tr style={{ background: isDark ? "#0D0D0D" : "#F9FAFB", borderBottom: `1px solid ${T.border}` }}>
               {cols.map((h) => (
                 <th
                   key={h}
@@ -705,7 +598,7 @@ function AbsenceTable({ data, loading }) {
                     textAlign: "left",
                     padding: "12px 16px",
                     fontSize: 10,
-                    color: "rgba(255,255,255,0.28)",
+                    color: T.textSubtle,
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: "0.10em",
@@ -720,7 +613,7 @@ function AbsenceTable({ data, loading }) {
           <tbody>
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
                   {cols.map((_, j) => (
                     <td key={j} style={{ padding: "12px 16px" }}>
                       <Skeleton style={{ height: 14, width: "80%" }} />
@@ -730,7 +623,7 @@ function AbsenceTable({ data, loading }) {
               ))
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: "48px 16px", textAlign: "center", color: "rgba(255,255,255,0.18)", fontSize: 13 }}>
+                <td colSpan={8} style={{ padding: "48px 16px", textAlign: "center", color: T.textSubtle, fontSize: 13 }}>
                   Nenhum resultado encontrado
                 </td>
               </tr>
@@ -742,18 +635,18 @@ function AbsenceTable({ data, loading }) {
                 return (
                   <tr
                     key={i}
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.03)", transition: "background 0.15s", cursor: "default" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")}
+                    style={{ borderBottom: `1px solid ${T.border}`, transition: "background 0.15s", cursor: "default" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.025)" : "#F3F4F6")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
-                    <td style={{ padding: "11px 16px", fontWeight: 500, color: "rgba(255,255,255,0.80)", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "11px 16px", fontWeight: 500, color: T.textMain, whiteSpace: "nowrap" }}>
                       {c.nome?.split(" ").slice(0, 2).join(" ")}
                     </td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.empresa}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.setor}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.turno}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.escala}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.tempoCasa}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.empresa}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.setor}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.turno}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.escala}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.tempoCasa}</td>
                     <td style={{ padding: "11px 16px", whiteSpace: "nowrap" }}>
                       <span
                         style={{
@@ -791,7 +684,7 @@ function AbsenceTable({ data, loading }) {
                           Sim
                         </span>
                       ) : (
-                        <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 12 }}>—</span>
+                        <span style={{ color: T.textSubtle, fontSize: 12 }}>—</span>
                       )}
                     </td>
                   </tr>
@@ -805,13 +698,13 @@ function AbsenceTable({ data, loading }) {
           <div
             style={{
               padding: "10px 16px",
-              borderTop: "1px solid rgba(255,255,255,0.04)",
+              borderTop: `1px solid ${T.border}`,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
             }}
           >
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.22)", margin: 0 }}>
+            <p style={{ fontSize: 11, color: T.textSubtle, margin: 0 }}>
               {filtered.length} de {data.length} colaboradores
             </p>
           </div>
@@ -823,6 +716,8 @@ function AbsenceTable({ data, loading }) {
 
 /* ─── MAIN ───────────────────────────────────────────────────────── */
 export default function DashboardFaltas() {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [inicio, setInicio] = useState(isoFirstDayOfMonth())
   const [fim, setFim] = useState(isoToday())
@@ -898,9 +793,6 @@ export default function DashboardFaltas() {
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   `
 
-  const { isDark } = useContext(ThemeContext)
-  const T = THEME[isDark ? "dark" : "light"]
-
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: T.bg, color: T.textMain }}>
       <style>{pulseStyle}</style>
@@ -940,7 +832,7 @@ export default function DashboardFaltas() {
                   Dashboard de Faltas
                 </h1>
               </div>
-              <p style={{ margin: "0 0 0 14px", fontSize: 13, color: "rgba(255,255,255,0.35)" }}>
+              <p style={{ margin: "0 0 0 14px", fontSize: 13, color: T.textMuted }}>
                 Panorama completo de ausências — impacto, recorrência e distribuição
               </p>
             </div>

@@ -10,7 +10,7 @@ const {
   errorResponse,
   notFoundResponse,
 } = require("../utils/response")
-const { detectarFaltasAutomatico } = require("../services/detectarFaltasAutomatico.service")
+const { gerarOnboardingAdmissao } = require("../services/onboardingAutomatico.service")
 
 /* =====================================================
    CONTADORES POR STATUS
@@ -525,9 +525,15 @@ const backfillFaltas = async (req, res) => {
       return errorResponse(res, "Intervalo máximo de 31 dias por chamada", 400);
     }
 
-    const resultado = await detectarFaltasAutomatico(dataInicio, dataFim);
+    // Gera onboarding para o período informado (dia a dia)
+    const resultados = [];
+    for (let d = new Date(inicio); d <= fim; d.setDate(d.getDate() + 1)) {
+      const r = await gerarOnboardingAdmissao(d.toISOString().slice(0, 10));
+      resultados.push(r);
+    }
+    const resultado = { sucesso: true, dias: resultados.length, detalhes: resultados };
 
-    return successResponse(res, resultado, "Backfill concluído");
+    return successResponse(res, resultado, "Onboarding gerado para o período");
 
   } catch (err) {
 

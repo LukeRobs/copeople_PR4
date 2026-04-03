@@ -1,20 +1,26 @@
+import { useContext } from "react";
+import { ThemeContext } from "../../context/ThemeContext";
 import KpiCard from "./KpiCard";
 
 export default function KpiCardsRow({ items = [] }) {
+  const { isDark } = useContext(ThemeContext);
+
   if (!items.length) return null;
 
   return (
-    <div className="bg-[#1A1A1C] rounded-2xl p-4 sm:p-6">
+    <div
+      style={{
+        background: isDark ? "#1A1A1C" : "#F3F4F6",
+        borderRadius: 16,
+        padding: 20,
+      }}
+    >
       <div
-        className="
-          grid
-          gap-4
-          sm:gap-5
-          grid-cols-1
-          sm:grid-cols-2
-          lg:grid-cols-3
-          xl:grid-cols-4
-        "
+        style={{
+          display: "grid",
+          gap: 16,
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+        }}
       >
         {items.map((item, i) => (
           <KpiCard
@@ -23,6 +29,7 @@ export default function KpiCardsRow({ items = [] }) {
             label={item.label}
             value={item.value}
             color={item.color}
+            bgColor={item.bgColor}
             suffix={item.suffix}
             tooltip={item.tooltip}
           />

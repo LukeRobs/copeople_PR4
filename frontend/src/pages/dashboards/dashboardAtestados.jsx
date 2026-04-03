@@ -57,8 +57,9 @@ const SINTOMA_CIDS = Object.entries(CID_DESCRICOES).reduce((acc, [codigo, sintom
 
 /* ─── SKELETON ───────────────────────────────────────────────────── */
 function Skeleton({ style = {} }) {
+  const { isDark } = useContext(ThemeContext)
   return (
-    <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 10, animation: "pulse 1.5s ease-in-out infinite", ...style }} />
+    <div style={{ background: isDark ? "rgba(255,255,255,0.05)" : "#E5E7EB", borderRadius: 10, animation: "pulse 1.5s ease-in-out infinite", ...style }} />
   )
 }
 
@@ -319,18 +320,25 @@ function SelectSintoma({ value, onChange }) {
 
 /* ─── BAR BLOCK ──────────────────────────────────────────────────── */
 function BarBlock({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const safeData = Array.isArray(data) ? data : []
-  if (!safeData.length) return <p className="text-sm text-white/60">Sem dados no período.</p>
+  if (!safeData.length) return <p style={{ fontSize: 13, color: T.textMuted }}>Sem dados no período.</p>
+  const tickColor = isDark ? "#BFBFC3" : "#6B7280"
+  const ttBg = isDark ? "#232323" : "#FFFFFF"
+  const ttBorder = isDark ? "rgba(255,255,255,0.1)" : "#E5E7EB"
+  const labelColor = isDark ? "#FFF" : "#111827"
+  const gridColor = isDark ? "rgba(255,255,255,0.08)" : "#E5E7EB"
   return (
     <div className="h-[280px]">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={safeData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-          <CartesianGrid stroke="rgba(255,255,255,0.08)" />
-          <XAxis dataKey="name" tick={{ fill: "#BFBFC3", fontSize: 12 }} />
-          <YAxis allowDecimals={false} tick={{ fill: "#BFBFC3", fontSize: 12 }} />
-          <Tooltip contentStyle={{ background: "#232323", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} />
+          <CartesianGrid stroke={gridColor} />
+          <XAxis dataKey="name" tick={{ fill: tickColor, fontSize: 12 }} />
+          <YAxis allowDecimals={false} tick={{ fill: tickColor, fontSize: 12 }} />
+          <Tooltip contentStyle={{ background: ttBg, border: `1px solid ${ttBorder}`, borderRadius: 8, color: T.textMain }} />
           <Bar dataKey="value" fill={BRAND}>
-            <LabelList dataKey="value" position="top" style={{ fill: "#FFF", fontSize: 12, fontWeight: 600 }} />
+            <LabelList dataKey="value" position="top" style={{ fill: labelColor, fontSize: 12, fontWeight: 600 }} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
@@ -340,8 +348,15 @@ function BarBlock({ data }) {
 
 /* ─── BAR BLOCK HORIZONTAL ───────────────────────────────────────── */
 function BarBlockHorizontal({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const safeData = Array.isArray(data) ? data : []
-  if (!safeData.length) return <p className="text-sm text-white/60">Sem dados no período.</p>
+  if (!safeData.length) return <p style={{ fontSize: 13, color: T.textMuted }}>Sem dados no período.</p>
+  const tickColor = isDark ? "#BFBFC3" : "#6B7280"
+  const ttBg = isDark ? "#232323" : "#FFFFFF"
+  const ttBorder = isDark ? "rgba(255,255,255,0.1)" : "#E5E7EB"
+  const labelColor = isDark ? "#FFF" : "#111827"
+  const gridColor = isDark ? "rgba(255,255,255,0.08)" : "#E5E7EB"
   const formatName = (name) => {
     const parts = String(name || "").trim().split(" ")
     return parts.length >= 2 ? `${parts[0]} ${parts[1]}` : name
@@ -351,12 +366,12 @@ function BarBlockHorizontal({ data }) {
     <div className="h-[280px] sm:h-80 lg:h-[360px]">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={formatted} layout="vertical" margin={{ left: 20, right: 20 }}>
-          <CartesianGrid stroke="rgba(255,255,255,0.08)" />
-          <XAxis type="number" allowDecimals={false} domain={[0, "dataMax + 2"]} tick={{ fill: "#BFBFC3", fontSize: 12 }} />
-          <YAxis type="category" dataKey="name" width={140} tick={{ fill: "#BFBFC3", fontSize: 11 }} />
-          <Tooltip contentStyle={{ background: "#232323", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} />
+          <CartesianGrid stroke={gridColor} />
+          <XAxis type="number" allowDecimals={false} domain={[0, "dataMax + 2"]} tick={{ fill: tickColor, fontSize: 12 }} />
+          <YAxis type="category" dataKey="name" width={140} tick={{ fill: tickColor, fontSize: 11 }} />
+          <Tooltip contentStyle={{ background: ttBg, border: `1px solid ${ttBorder}`, borderRadius: 8, color: T.textMain }} />
           <Bar dataKey="value" fill={BRAND}>
-            <LabelList dataKey="value" position="right" style={{ fill: "#FFF", fontSize: 12, fontWeight: 600 }} />
+            <LabelList dataKey="value" position="right" style={{ fill: labelColor, fontSize: 12, fontWeight: 600 }} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
@@ -366,22 +381,29 @@ function BarBlockHorizontal({ data }) {
 
 /* ─── BAR BLOCK HORIZONTAL CID ───────────────────────────────────── */
 function BarBlockHorizontalCID({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const safeData = Array.isArray(data) ? data : []
-  if (!safeData.length) return <p className="text-sm text-white/60">Sem dados no período.</p>
+  if (!safeData.length) return <p style={{ fontSize: 13, color: T.textMuted }}>Sem dados no período.</p>
+  const tickColor  = isDark ? "#BFBFC3" : "#6B7280"
+  const ttBg       = isDark ? "#232323" : "#FFFFFF"
+  const ttBorder   = isDark ? "rgba(255,255,255,0.1)" : "#E5E7EB"
+  const labelColor = isDark ? "#FFF" : "#111827"
+  const gridColor  = isDark ? "rgba(255,255,255,0.06)" : "#E5E7EB"
   const height = Math.max(260, safeData.length * 34)
   return (
     <div style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={safeData} layout="vertical" barSize={18} barCategoryGap="18%" margin={{ top: 5, right: 28, left: 10, bottom: 5 }}>
-          <CartesianGrid stroke="rgba(255,255,255,0.06)" />
-          <XAxis type="number" allowDecimals={false} domain={[0, (dataMax) => dataMax + 0.3]} tick={{ fill: "#BFBFC3", fontSize: 12 }} />
-          <YAxis type="category" dataKey="name" width={120} tick={{ fill: "#BFBFC3", fontSize: 12 }} />
+          <CartesianGrid stroke={gridColor} />
+          <XAxis type="number" allowDecimals={false} domain={[0, (dataMax) => dataMax + 0.3]} tick={{ fill: tickColor, fontSize: 12 }} />
+          <YAxis type="category" dataKey="name" width={120} tick={{ fill: tickColor, fontSize: 12 }} />
           <Tooltip
             formatter={(value, _, props) => [`${value} atestados`, props.payload.full || props.payload.name]}
-            contentStyle={{ background: "#232323", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }}
+            contentStyle={{ background: ttBg, border: `1px solid ${ttBorder}`, borderRadius: 8, color: T.textMain }}
           />
           <Bar dataKey="value" fill={BRAND} radius={[0, 6, 6, 0]}>
-            <LabelList dataKey="value" position="right" style={{ fill: "#FFFFFF", fontSize: 12, fontWeight: 600 }} />
+            <LabelList dataKey="value" position="right" style={{ fill: labelColor, fontSize: 12, fontWeight: 600 }} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
@@ -391,16 +413,22 @@ function BarBlockHorizontalCID({ data }) {
 
 /* ─── PIE BLOCK ──────────────────────────────────────────────────── */
 function PieBlock({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   const safeData = Array.isArray(data) ? data : []
-  if (!safeData.length) return <p className="text-sm text-white/60">Sem dados no período.</p>
+  if (!safeData.length) return <p style={{ fontSize: 13, color: T.textMuted }}>Sem dados no período.</p>
+  const ttBg     = isDark ? "#232323" : "#FFFFFF"
+  const ttBorder = isDark ? "rgba(255,255,255,0.1)" : "#E5E7EB"
   return (
     <div className="h-[220px]">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-          <Pie data={safeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+          <Pie data={safeData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
+            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            labelLine={false}>
             {safeData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
           </Pie>
-          <Tooltip contentStyle={{ background: "#232323", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} />
+          <Tooltip contentStyle={{ background: ttBg, border: `1px solid ${ttBorder}`, borderRadius: 8, color: T.textMain }} />
         </PieChart>
       </ResponsiveContainer>
     </div>
@@ -409,38 +437,39 @@ function PieBlock({ data }) {
 
 /* ─── TOP OFENSORES TABLE ────────────────────────────────────────── */
 function TopOfensoresTable({ rows, loading }) {
-  if (loading) return <p className="text-sm text-white/60">Carregando…</p>
-  if (!rows?.length) return <p className="text-sm text-white/60">Sem ofensores no período.</p>
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
+  if (loading) return <p style={{ fontSize: 13, color: T.textMuted }}>Carregando…</p>
+  if (!rows?.length) return <p style={{ fontSize: 13, color: T.textMuted }}>Sem ofensores no período.</p>
   return (
     <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
       <table className="w-full text-sm" style={{ minWidth: 480, borderCollapse: "collapse" }}>
-        <thead className="text-white/60">
-          <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            <th className="text-left py-2 pr-2" style={{ width: 28 }}>#</th>
-            <th className="text-left py-2 pr-2">Colaborador</th>
-            <th className="text-left py-2 pr-2 hidden sm:table-cell">Empresa</th>
-            <th className="text-left py-2 pr-2">Setor</th>
-            <th className="text-left py-2 pr-2">Turno</th>
-            <th className="text-left py-2 pr-2 hidden md:table-cell">Tempo</th>
-            <th className="text-right py-2 pr-2">Atst.</th>
-            <th className="text-right py-2">Dias</th>
+        <thead>
+          <tr style={{ borderBottom: `1px solid ${T.border}` }}>
+            {["#","Colaborador","Empresa","Setor","Turno","Tempo","Atst.","Dias"].map((h, i) => (
+              <th key={h} style={{ textAlign: i >= 6 ? "right" : "left", padding: "8px 8px 8px 0", fontSize: 11, color: T.textMuted, fontWeight: 600 }}>{h}</th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.opsId} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }} className="hover:bg-white/5 transition">
-              <td className="py-2 pr-2 text-white/50" style={{ fontSize: 12 }}>{r.rank}</td>
-              <td className="py-2 pr-2 font-medium" style={{ maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.nome}>{r.nome}</td>
-              <td className="py-2 pr-2 text-white/70 hidden sm:table-cell" style={{ fontSize: 12, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.empresa}>{r.empresa || "N/I"}</td>
-              <td className="py-2 pr-2 text-white/70" style={{ fontSize: 12, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.setor}>{r.setor || "N/I"}</td>
-              <td className="py-2 pr-2 text-white/70" style={{ fontSize: 12, whiteSpace: "nowrap" }}>{r.turno || "N/I"}</td>
-              <td className="py-2 pr-2 hidden md:table-cell">
-                <span className={`px-2 py-1 rounded-md text-xs font-semibold ${r.tempoCasaFaixa === "0 a 7" || r.tempoCasaFaixa === "8 a 15" || r.tempoCasaFaixa === "16 a 30" ? "bg-[#FF453A]/20 text-[#FF453A]" : r.tempoCasaFaixa === "31 a 89" ? "bg-[#FF9F0A]/20 text-[#FF9F0A]" : "bg-[#34C759]/20 text-[#34C759]"}`}>
+            <tr key={r.opsId} style={{ borderBottom: `1px solid ${T.border}` }}>
+              <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: T.textSubtle }}>{r.rank}</td>
+              <td style={{ padding: "8px 8px 8px 0", fontWeight: 500, color: T.textMain, maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.nome}>{r.nome}</td>
+              <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: T.textMuted, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.empresa}>{r.empresa || "N/I"}</td>
+              <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: T.textMuted, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.setor}>{r.setor || "N/I"}</td>
+              <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: T.textMuted, whiteSpace: "nowrap" }}>{r.turno || "N/I"}</td>
+              <td style={{ padding: "8px 8px 8px 0" }}>
+                <span style={{
+                  padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600,
+                  background: ["0 a 7","8 a 15","16 a 30"].includes(r.tempoCasaFaixa) ? "#FF453A22" : r.tempoCasaFaixa === "31 a 89" ? "#FF9F0A22" : "#34C75922",
+                  color:       ["0 a 7","8 a 15","16 a 30"].includes(r.tempoCasaFaixa) ? "#FF453A"   : r.tempoCasaFaixa === "31 a 89" ? "#FF9F0A"   : "#34C759",
+                }}>
                   {r.tempoCasaFaixa || "N/I"}
                 </span>
               </td>
-              <td className="py-2 pr-2 text-right font-semibold" style={{ fontSize: 13 }}>{r.totalAtestados}</td>
-              <td className="py-2 text-right font-semibold text-[#FA4C00]" style={{ fontSize: 13 }}>{r.diasAfastados}</td>
+              <td style={{ padding: "8px 8px 8px 0", textAlign: "right", fontWeight: 600, fontSize: 13, color: T.textMain }}>{r.totalAtestados}</td>
+              <td style={{ padding: "8px 0", textAlign: "right", fontWeight: 600, fontSize: 13, color: "#FA4C00" }}>{r.diasAfastados}</td>
             </tr>
           ))}
         </tbody>
@@ -453,6 +482,9 @@ function TopOfensoresTable({ rows, loading }) {
 const COLS = ["Colaborador", "Empresa", "Setor", "Turno", "Escala", "Tempo Casa", "Atestados"]
 
 function ColaboradoresTable({ data, loading, filtroTempoCasa, setFiltroTempoCasa, filtroTurno, setFiltroTurno, colaboradores }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
+
   const filtered = useMemo(() => {
     const tempoCasaMap = { "0 a 7": ["0 a 7"], "8 a 15": ["8 a 15"], "16 a 30": ["16 a 30"], "31 a 89": ["31 a 89"], "90+": ["90+"] }
     return data.filter((c) => {
@@ -462,56 +494,57 @@ function ColaboradoresTable({ data, loading, filtroTempoCasa, setFiltroTempoCasa
     })
   }, [data, filtroTempoCasa, filtroTurno])
 
+  const selectStyle = { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "8px 12px", fontSize: 13, color: T.textMain, outline: "none" }
+
   return (
     <Card title="Colaboradores com Atestados">
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <select value={filtroTempoCasa} onChange={(e) => setFiltroTempoCasa(e.target.value)} className="bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm">
+        <select value={filtroTempoCasa} onChange={(e) => setFiltroTempoCasa(e.target.value)} style={selectStyle}>
           <option value="">Tempo de casa (Todos)</option>
-          <option value="0 a 7">0 a 7</option>
-          <option value="8 a 15">8 a 15</option>
-          <option value="16 a 30">16 a 30</option>
-          <option value="31 a 89">31 a 89</option>
-          <option value="90+">90+</option>
+          {["0 a 7","8 a 15","16 a 30","31 a 89","90+"].map(v => <option key={v} value={v}>{v}</option>)}
         </select>
-        <select value={filtroTurno} onChange={(e) => setFiltroTurno(e.target.value)} className="bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm">
+        <select value={filtroTurno} onChange={(e) => setFiltroTurno(e.target.value)} style={selectStyle}>
           <option value="">Turno (Todos)</option>
           {[...new Set(colaboradores.map((c) => c.turno))].map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </select>
       </div>
-      <div style={{ overflowX: "auto", borderRadius: 14, border: "1px solid rgba(255,255,255,0.06)" }}>
+      <div style={{ overflowX: "auto", borderRadius: 14, border: `1px solid ${T.borderCard}` }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700, fontSize: 13 }}>
           <thead>
-            <tr style={{ background: "#0D0D0D", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <tr style={{ background: isDark ? "#0D0D0D" : "#F9FAFB", borderBottom: `1px solid ${T.border}` }}>
               {COLS.map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 10, color: "rgba(255,255,255,0.28)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.10em", whiteSpace: "nowrap" }}>{h}</th>
+                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 10, color: T.textSubtle, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.10em", whiteSpace: "nowrap" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
                   {COLS.map((_, j) => <td key={j} style={{ padding: "12px 16px" }}><Skeleton style={{ height: 14, width: "80%" }} /></td>)}
                 </tr>
               ))
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={COLS.length} style={{ padding: "48px 16px", textAlign: "center", color: "rgba(255,255,255,0.18)", fontSize: 13 }}>Nenhum resultado encontrado</td></tr>
+              <tr><td colSpan={COLS.length} style={{ padding: "48px 16px", textAlign: "center", color: T.textSubtle, fontSize: 13 }}>Nenhum resultado encontrado</td></tr>
             ) : (
               filtered.map((c, i) => {
                 const atst = c.totalAtestados || 0
                 const atstColor = atst >= 3 ? "#EF4444" : atst >= 2 ? "#F59E0B" : BRAND
-                const atstBg = atst >= 3 ? "#EF444418" : atst >= 2 ? "#F59E0B18" : `${BRAND}14`
+                const atstBg   = atst >= 3 ? "#EF444418" : atst >= 2 ? "#F59E0B18" : `${BRAND}14`
                 return (
-                  <tr key={c.opsId || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)", transition: "background 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
-                    <td style={{ padding: "11px 16px", fontWeight: 500, color: "rgba(255,255,255,0.80)", whiteSpace: "nowrap" }}>{c.nome}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.empresa}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.setor}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.turno}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{c.escala}</td>
+                  <tr key={c.opsId || i} style={{ borderBottom: `1px solid ${T.border}`, transition: "background 0.15s" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = T.cardHover)}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <td style={{ padding: "11px 16px", fontWeight: 500, color: T.textMain, whiteSpace: "nowrap" }}>{c.nome}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.empresa}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.setor}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.turno}</td>
+                    <td style={{ padding: "11px 16px", color: T.textMuted, whiteSpace: "nowrap" }}>{c.escala}</td>
                     <td style={{ padding: "11px 16px", whiteSpace: "nowrap" }}>
-                      <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)", fontSize: 12 }}>{c.tempoCasa}</span>
+                      <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 8, background: isDark ? "rgba(255,255,255,0.06)" : "#F3F4F6", color: T.textMuted, fontSize: 12 }}>{c.tempoCasa}</span>
                     </td>
                     <td style={{ padding: "11px 16px", whiteSpace: "nowrap" }}>
                       <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, background: atstBg, color: atstColor, fontWeight: 700, fontSize: 13 }}>{atst}</span>
@@ -523,8 +556,8 @@ function ColaboradoresTable({ data, loading, filtroTempoCasa, setFiltroTempoCasa
           </tbody>
         </table>
         {!loading && filtered.length > 0 && (
-          <div style={{ padding: "10px 16px", borderTop: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.22)", margin: 0 }}>{filtered.length} de {data.length} colaboradores</p>
+          <div style={{ padding: "10px 16px", borderTop: `1px solid ${T.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <p style={{ fontSize: 11, color: T.textSubtle, margin: 0 }}>{filtered.length} de {data.length} colaboradores</p>
           </div>
         )}
       </div>
@@ -708,12 +741,12 @@ export default function DashboardAtestados() {
               <div className="h-[220px] sm:h-[260px] lg:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={Array.isArray(tendencia) ? tendencia : []}>
-                    <CartesianGrid stroke="rgba(255,255,255,0.08)" />
-                    <XAxis dataKey="data" tick={{ fill: "#BFBFC3", fontSize: 12 }} minTickGap={20} />
-                    <YAxis tick={{ fill: "#BFBFC3", fontSize: 12 }} allowDecimals={false} />
-                    <Tooltip contentStyle={{ background: "#1A1A1C", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} />
+                    <CartesianGrid stroke={isDark ? "rgba(255,255,255,0.08)" : "#E5E7EB"} />
+                    <XAxis dataKey="data" tick={{ fill: isDark ? "#BFBFC3" : "#6B7280", fontSize: 12 }} minTickGap={20} />
+                    <YAxis tick={{ fill: isDark ? "#BFBFC3" : "#6B7280", fontSize: 12 }} allowDecimals={false} />
+                    <Tooltip contentStyle={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.textMain }} />
                     <Line type="monotone" dataKey="total" stroke={BRAND} strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }}>
-                      <LabelList dataKey="total" position="top" style={{ fill: "#FFFFFF", fontSize: 12, fontWeight: 600 }} />
+                      <LabelList dataKey="total" position="top" style={{ fill: T.textMain, fontSize: 12, fontWeight: 600 }} />
                     </Line>
                   </LineChart>
                 </ResponsiveContainer>
@@ -743,12 +776,12 @@ export default function DashboardAtestados() {
                 <div className="h-[280px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={porTempoCasa}>
-                      <CartesianGrid stroke="rgba(255,255,255,0.08)" />
-                      <XAxis dataKey="name" tick={{ fill: "#BFBFC3", fontSize: 12 }} />
-                      <YAxis allowDecimals={false} tick={{ fill: "#BFBFC3", fontSize: 12 }} />
-                      <Tooltip contentStyle={{ background: "#232323", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} />
+                      <CartesianGrid stroke={isDark ? "rgba(255,255,255,0.08)" : "#E5E7EB"} />
+                      <XAxis dataKey="name" tick={{ fill: T.textMuted, fontSize: 12 }} />
+                      <YAxis allowDecimals={false} tick={{ fill: T.textMuted, fontSize: 12 }} />
+                      <Tooltip contentStyle={{ background: isDark ? "#232323" : "#FFFFFF", border: `1px solid ${T.border}`, borderRadius: 8, color: T.textMain }} />
                       <Bar dataKey="value" fill={BRAND}>
-                        <LabelList dataKey="value" position="top" style={{ fill: "#FFF", fontSize: 12, fontWeight: 600 }} />
+                        <LabelList dataKey="value" position="top" style={{ fill: isDark ? "#FFF" : "#111827", fontSize: 12, fontWeight: 600 }} />
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
@@ -756,23 +789,26 @@ export default function DashboardAtestados() {
               </Card>
 
               <Card title="CID — Distribuição Completa">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="text-white/60">
-                      <tr>
-                        <th className="text-left py-2">Categoria</th>
-                        <th className="text-right py-2">Qtd</th>
-                        <th className="text-right py-2">% Total</th>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ borderBottom: `1px solid ${T.border}` }}>
+                        <th style={{ textAlign: "left", padding: "8px 0", color: T.textMuted, fontWeight: 600, fontSize: 11 }}>Categoria</th>
+                        <th style={{ textAlign: "right", padding: "8px 0", color: T.textMuted, fontWeight: 600, fontSize: 11 }}>Qtd</th>
+                        <th style={{ textAlign: "right", padding: "8px 0", color: T.textMuted, fontWeight: 600, fontSize: 11 }}>% Total</th>
                       </tr>
                     </thead>
                     <tbody>
                       {(() => {
                         const total = cidTableData.reduce((acc, i) => acc + i.value, 0)
                         return cidTableData.map((c, index) => (
-                          <tr key={index} className="border-t border-white/5 hover:bg-white/5">
-                            <td className="py-2 font-medium">{c.name === "Outros" ? <span className="text-white/50">{c.name}</span> : c.name}</td>
-                            <td className="py-2 text-right font-semibold">{c.value}</td>
-                            <td className="py-2 text-right text-[#FA4C00] font-semibold">{total > 0 ? ((c.value / total) * 100).toFixed(1) : 0}%</td>
+                          <tr key={index} style={{ borderTop: `1px solid ${T.border}` }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = T.cardHover)}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                          >
+                            <td style={{ padding: "8px 0", fontWeight: 500, color: c.name === "Outros" ? T.textSubtle : T.textMain }}>{c.name}</td>
+                            <td style={{ padding: "8px 0", textAlign: "right", fontWeight: 600, color: T.textMain }}>{c.value}</td>
+                            <td style={{ padding: "8px 0", textAlign: "right", fontWeight: 600, color: "#FA4C00" }}>{total > 0 ? ((c.value / total) * 100).toFixed(1) : 0}%</td>
                           </tr>
                         ))
                       })()}

@@ -728,6 +728,17 @@ const getControlePresenca = async (req, res) => {
         const key = `${c.opsId}_${dataISO}`;
 
         /* ===============================
+           ANTES DA ADMISSÃO — célula vazia
+        =============================== */
+        if (c.dataAdmissao) {
+          const diaAdmissao = startOfDay(c.dataAdmissao);
+          if (dataCalendario < diaAdmissao) {
+            diasMap[dataISO] = { status: "NC", manual: false };
+            continue;
+          }
+        }
+
+        /* ===============================
            ATESTADO MÉDICO TEM PRIORIDADE MÁXIMA
            (exceto quando o dia é DSR)
         =============================== */

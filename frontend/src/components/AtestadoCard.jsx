@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import {
   FileText,
   Calendar,
@@ -10,6 +11,7 @@ import {
 
 import { Badge, Button } from "./UIComponents";
 import { formatDateBR } from "../utils/date";
+import { ThemeContext } from "../context/ThemeContext";
 
 export default function AtestadoCard({
   atestado,
@@ -17,9 +19,22 @@ export default function AtestadoCard({
   onCancelar,
   onDownload,
 }) {
-  const isAtivo = atestado.status === "ATIVO";
+  const { isDark } = useContext(ThemeContext);
+
+  /* ── theme tokens ── */
+  const cardBg        = isDark ? "#161618" : "#FFFFFF";
+  const cardBorder    = isDark ? "#2C2C2F" : "#E5E7EB";
+  const avatarBg      = isDark ? "#2A2A2C" : "#F3F4F6";
+  const textPrimary   = isDark ? "#FFFFFF"  : "#111827";
+  const textSecondary = isDark ? "#9CA3AF"  : "#6B7280";
+  const periodBg      = isDark ? "#0E0E0F"  : "#F9FAFB";
+  const daysBadgeBg   = isDark ? "#1F1F22"  : "#F3F4F6";
+  const obsBg         = isDark ? "#0F0F10"  : "#F9FAFB";
+  const obsMuted      = isDark ? "rgba(255,255,255,0.90)" : "#374151";
+
+  const isAtivo      = atestado.status === "ATIVO";
   const isFinalizado = atestado.status === "FINALIZADO";
-  const isCancelado = atestado.status === "CANCELADO";
+  const isCancelado  = atestado.status === "CANCELADO";
 
   const diasLabel =
     atestado.diasAfastamento === 1
@@ -34,32 +49,32 @@ export default function AtestadoCard({
 
   return (
     <div
-      className={`
-        bg-[#161618]
-        border border-[#2C2C2F]
-        border-l-4 ${statusColor}
-        rounded-2xl
-        p-4 sm:p-5 lg:p-6
-        space-y-5
-        hover:border-[#3D3D40]
-        transition-all
-      `}
+      style={{
+        background: cardBg,
+        border: `1px solid ${cardBorder}`,
+        borderRadius: 16,
+        padding: "16px 20px",
+      }}
+      className={`border-l-4 ${statusColor} space-y-5 transition-all`}
     >
       {/* ================= HEADER ================= */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        
+
         {/* BLOCO ESQUERDO */}
         <div className="flex items-center gap-4 min-w-0">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#2A2A2C] flex items-center justify-center shrink-0">
+          <div
+            style={{ background: avatarBg }}
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0"
+          >
             <FileText size={20} className="text-orange-400" />
           </div>
 
           <div className="min-w-0">
-            <p className="text-sm sm:text-base font-semibold text-white truncate">
+            <p className="text-sm sm:text-base font-semibold truncate" style={{ color: textPrimary }}>
               {atestado.colaborador?.nomeCompleto || atestado.opsId}
             </p>
 
-            <p className="text-xs text-[#9CA3AF] mt-1 truncate">
+            <p className="text-xs mt-1 truncate" style={{ color: textSecondary }}>
               OPS ID: {atestado.opsId}
             </p>
           </div>
@@ -81,28 +96,38 @@ export default function AtestadoCard({
       </div>
 
       {/* ================= PERÍODO ================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#0E0E0F] border border-[#2C2C2F] rounded-xl p-3 sm:p-4">
-        
-        <div className="flex items-center gap-3 text-xs sm:text-sm text-white">
-          <Calendar size={15} className="text-[#9CA3AF]" />
+      <div
+        style={{
+          background: periodBg,
+          border: `1px solid ${cardBorder}`,
+          borderRadius: 12,
+          padding: "12px 16px",
+        }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      >
+        <div className="flex items-center gap-3 text-xs sm:text-sm" style={{ color: textPrimary }}>
+          <Calendar size={15} style={{ color: textSecondary }} />
           <span className="wrap-break-words">
             {formatDateBR(atestado.dataInicio)} →{" "}
             {formatDateBR(atestado.dataFim)}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 bg-[#1F1F22] px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold tracking-wide text-white w-fit">
-          <Clock size={14} className="text-[#9CA3AF]" />
+        <div
+          style={{ background: daysBadgeBg, color: textPrimary }}
+          className="flex items-center gap-2 px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold tracking-wide w-fit"
+        >
+          <Clock size={14} style={{ color: textSecondary }} />
           {diasLabel}
         </div>
       </div>
 
       {/* ================= CID ================= */}
       {atestado.cid && (
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-[#E5E7EB]">
-          <FileWarning size={15} className="text-[#9CA3AF]" />
+        <div className="flex items-center gap-2 text-xs sm:text-sm" style={{ color: textPrimary }}>
+          <FileWarning size={15} style={{ color: textSecondary }} />
           <span className="wrap-break-words">
-            <span className="text-white/80 font-medium">CID:</span>{" "}
+            <span className="font-medium" style={{ color: textPrimary }}>CID:</span>{" "}
             {atestado.cid}
           </span>
         </div>
@@ -110,24 +135,33 @@ export default function AtestadoCard({
 
       {/* ================= OBSERVAÇÕES ================= */}
       {atestado.observacao && (
-        <div className="bg-[#0F0F10] border border-[#2C2C2F] rounded-xl p-3 sm:p-4">
-          <p className="text-[10px] uppercase text-[#9CA3AF] tracking-wider mb-2">
+        <div
+          style={{
+            background: obsBg,
+            border: `1px solid ${cardBorder}`,
+            borderRadius: 12,
+            padding: "12px 16px",
+          }}
+        >
+          <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color: textSecondary }}>
             Observações
           </p>
 
-          <p className="text-xs sm:text-sm text-white/90 leading-relaxed line-clamp-4">
+          <p className="text-xs sm:text-sm leading-relaxed line-clamp-4" style={{ color: obsMuted }}>
             {atestado.observacao}
           </p>
         </div>
       )}
 
       {/* ================= FOOTER ================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-[#2C2C2F]">
-        
-        <div className="text-[11px] sm:text-xs text-[#9CA3AF]">
+      <div
+        style={{ borderTop: `1px solid ${cardBorder}` }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4"
+      >
+        <div className="text-[11px] sm:text-xs" style={{ color: textSecondary }}>
           {isFinalizado && "Atestado Finalizado"}
-          {isCancelado && "Atestado cancelado"}
-          {isAtivo && "Atestado Ativo"}
+          {isCancelado  && "Atestado cancelado"}
+          {isAtivo      && "Atestado Ativo"}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">

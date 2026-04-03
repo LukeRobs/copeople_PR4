@@ -18,6 +18,7 @@ import Header from "../../components/Header";
 import api from "../../services/api";
 import { TreinamentosAPI } from "../../services/treinamentos";
 import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
 
 /* =====================================================
    PAGE — DETALHES DO TREINAMENTO
@@ -26,6 +27,7 @@ export default function DetalhesTreinamento() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
+  const { isDark } = useContext(ThemeContext);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -43,6 +45,42 @@ export default function DetalhesTreinamento() {
   const [turnosList, setTurnosList] = useState([]);
   const [selecionados, setSelecionados] = useState([]);
   const [salvando, setSalvando] = useState(false);
+
+  /* ── theme tokens ── */
+  const bg            = isDark ? "#0D0D0D"  : "#F3F4F6";
+  const cardBg        = isDark ? "#1A1A1C"  : "#FFFFFF";
+  const cardBorder    = isDark ? "#2A2A2C"  : "#E5E7EB";
+  const labelColor    = isDark ? "#BFBFC3"  : "#6B7280";
+  const textMain      = isDark ? "#FFFFFF"  : "#111827";
+  const sectorBadge   = isDark ? "#262628"  : "#F3F4F6";
+  const sectorText    = isDark ? "#FFFFFF"  : "#374151";
+  const printBtnBg    = isDark ? "#262628"  : "#F3F4F6";
+  const printBtnHover = isDark ? "#3A3A3C"  : "#E5E7EB";
+
+  /* modal tokens */
+  const modalBg       = isDark ? "#1A1A1C"  : "#FFFFFF";
+  const modalBorder   = isDark ? "rgba(255,255,255,0.10)" : "#E5E7EB";
+  const modalDivider  = isDark ? "rgba(255,255,255,0.05)" : "#F3F4F6";
+  const inputBg       = isDark ? "rgba(0,0,0,0.30)"       : "#F9FAFB";
+  const inputBorder   = isDark ? "rgba(255,255,255,0.10)" : "#E5E7EB";
+  const inputText     = isDark ? "#FFFFFF"  : "#111827";
+  const inputPlaceholder = isDark ? "rgba(255,255,255,0.30)" : "#9CA3AF";
+  const metaText      = isDark ? "rgba(255,255,255,0.40)" : "#9CA3AF";
+  const itemHover     = isDark ? "rgba(255,255,255,0.05)" : "#F9FAFB";
+
+  /* drop zone tokens */
+  const dropBase      = isDark ? "rgba(255,255,255,0.10)" : "#E5E7EB";
+  const dropBaseBg    = isDark ? "rgba(255,255,255,0.02)" : "#F9FAFB";
+  const dropIconBg    = isDark ? "rgba(255,255,255,0.05)" : "#F3F4F6";
+  const dropIconColor = isDark ? "rgba(255,255,255,0.30)" : "#D1D5DB";
+  const dropLabelMuted = isDark ? "rgba(255,255,255,0.70)" : "#6B7280";
+  const dropLabelSub  = isDark ? "rgba(255,255,255,0.30)" : "#9CA3AF";
+  const dropNameColor = isDark ? "#FFFFFF" : "#111827";
+  const dropSizeColor = isDark ? "rgba(255,255,255,0.40)" : "#9CA3AF";
+
+  /* disabled btn */
+  const disabledBg    = isDark ? "rgba(255,255,255,0.05)" : "#F3F4F6";
+  const disabledText  = isDark ? "rgba(255,255,255,0.30)" : "#9CA3AF";
 
   /* ================= LOAD ================= */
   async function load() {
@@ -71,7 +109,6 @@ export default function DetalhesTreinamento() {
       setColaboradores(colabRes.data.data || colabRes.data);
       setSetores(setoresRes.data.data || setoresRes.data);
       setTurnosList(turnosRes.data.data || turnosRes.data);
-      // pré-seleciona os participantes atuais
       setSelecionados(
         treinamento.participantes.map((p) => ({ opsId: p.opsId, cpf: p.cpf || null }))
       );
@@ -160,14 +197,21 @@ export default function DetalhesTreinamento() {
 
   /* ================= RENDER ================= */
   if (loading) {
-    return <div className="h-screen flex items-center justify-center text-[#BFBFC3]">Carregando…</div>;
+    return (
+      <div
+        className="h-screen flex items-center justify-center"
+        style={{ color: labelColor }}
+      >
+        Carregando…
+      </div>
+    );
   }
   if (!treinamento) return null;
 
   const statusColor = treinamento.status === "FINALIZADO" ? "text-[#34C759]" : "text-[#FFD60A]";
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white">
+    <div style={{ display: "flex", minHeight: "100vh", background: bg, color: textMain }}>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} navigate={navigate} />
 
       <div className="flex-1 lg:ml-64">
@@ -176,7 +220,11 @@ export default function DetalhesTreinamento() {
         <main className="p-8 space-y-8 max-w-6xl">
           {/* HEADER */}
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate("/treinamentos")} className="text-[#BFBFC3] hover:text-white">
+            <button
+              onClick={() => navigate("/treinamentos")}
+              style={{ color: labelColor }}
+              className="hover:opacity-70 transition-opacity"
+            >
               <ArrowLeft />
             </button>
             <div>
@@ -186,37 +234,46 @@ export default function DetalhesTreinamento() {
           </div>
 
           {/* CARD PRINCIPAL */}
-          <div className="bg-[#1A1A1C] rounded-2xl p-6 space-y-6">
+          <div
+            style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+            className="rounded-2xl p-6 space-y-6"
+          >
             {/* INFO */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-[#BFBFC3]">Data</span>
-                <p>{new Date(treinamento.dataTreinamento).toLocaleDateString("pt-BR")}</p>
+                <span style={{ color: labelColor }}>Data</span>
+                <p style={{ color: textMain }}>
+                  {new Date(treinamento.dataTreinamento).toLocaleDateString("pt-BR")}
+                </p>
               </div>
               <div>
-                <span className="text-[#BFBFC3]">SOC</span>
-                <p>{treinamento.soc}</p>
+                <span style={{ color: labelColor }}>SOC</span>
+                <p style={{ color: textMain }}>{treinamento.soc}</p>
               </div>
               <div>
-                <span className="text-[#BFBFC3]">Processo</span>
-                <p>{treinamento.processo}</p>
+                <span style={{ color: labelColor }}>Processo</span>
+                <p style={{ color: textMain }}>{treinamento.processo}</p>
               </div>
               <div>
-                <span className="text-[#BFBFC3]">Tema</span>
-                <p>{treinamento.tema}</p>
+                <span style={{ color: labelColor }}>Tema</span>
+                <p style={{ color: textMain }}>{treinamento.tema}</p>
               </div>
               <div>
-                <span className="text-[#BFBFC3]">Líder Responsável</span>
-                <p>{treinamento.liderResponsavel?.nomeCompleto}</p>
+                <span style={{ color: labelColor }}>Líder Responsável</span>
+                <p style={{ color: textMain }}>{treinamento.liderResponsavel?.nomeCompleto}</p>
               </div>
             </div>
 
             {/* SETORES */}
             <div>
-              <h3 className="text-sm text-[#BFBFC3] mb-2">Setores</h3>
+              <h3 className="text-sm mb-2" style={{ color: labelColor }}>Setores</h3>
               <div className="flex flex-wrap gap-2">
                 {treinamento.setores.map((s) => (
-                  <span key={s.idTreinamentoSetor} className="px-3 py-1 rounded-full text-xs bg-[#262628]">
+                  <span
+                    key={s.idTreinamentoSetor}
+                    style={{ background: sectorBadge, color: sectorText }}
+                    className="px-3 py-1 rounded-full text-xs"
+                  >
                     {s.setor?.nomeSetor}
                   </span>
                 ))}
@@ -226,7 +283,7 @@ export default function DetalhesTreinamento() {
             {/* PARTICIPANTES */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm text-[#BFBFC3]">
+                <h3 className="text-sm" style={{ color: labelColor }}>
                   Participantes ({treinamento.participantes.length})
                 </h3>
                 {treinamento.status === "ABERTO" && (
@@ -240,14 +297,20 @@ export default function DetalhesTreinamento() {
                 )}
               </div>
 
-              <div className="border border-[#2A2A2C] rounded-xl overflow-hidden">
+              <div
+                style={{ border: `1px solid ${cardBorder}` }}
+                className="rounded-xl overflow-hidden"
+              >
                 {treinamento.participantes.map((p) => (
                   <div
                     key={p.idTreinamentoParticipante}
-                    className="px-4 py-2 flex justify-between text-sm border-b border-[#2A2A2C] last:border-b-0"
+                    style={{ borderBottom: `1px solid ${cardBorder}` }}
+                    className="px-4 py-2 flex justify-between text-sm last:border-b-0"
                   >
-                    <span>{p.colaborador?.nomeCompleto || p.opsId}</span>
-                    <span className="text-[#BFBFC3]">{p.cpf || "-"}</span>
+                    <span style={{ color: textMain }}>
+                      {p.colaborador?.nomeCompleto || p.opsId}
+                    </span>
+                    <span style={{ color: labelColor }}>{p.cpf || "-"}</span>
                   </div>
                 ))}
               </div>
@@ -257,7 +320,10 @@ export default function DetalhesTreinamento() {
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => printAtaTreinamento(treinamento)}
-                className="flex items-center gap-2 px-6 py-2 rounded-xl bg-[#262628] hover:bg-[#3A3A3C]"
+                style={{ background: printBtnBg, color: textMain }}
+                className="flex items-center gap-2 px-6 py-2 rounded-xl text-sm transition-colors"
+                onMouseEnter={(e) => (e.currentTarget.style.background = printBtnHover)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = printBtnBg)}
               >
                 <Printer size={16} />
                 Imprimir Ata
@@ -267,15 +333,17 @@ export default function DetalhesTreinamento() {
             {/* FINALIZAÇÃO */}
             {treinamento.status === "ABERTO" && (
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-white/70">Finalizar Treinamento</h3>
+                <h3 className="text-sm font-medium" style={{ color: labelColor }}>
+                  Finalizar Treinamento
+                </h3>
 
                 {/* DROP ZONE */}
                 <label
-                  className={`flex flex-col items-center justify-center gap-3 w-full py-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${
-                    file
-                      ? "border-[#FA4C00]/60 bg-[#FA4C00]/5"
-                      : "border-white/10 bg-white/[0.02] hover:border-[#FA4C00]/40 hover:bg-[#FA4C00]/5"
-                  }`}
+                  style={{
+                    borderColor: file ? "rgba(250,76,0,0.60)" : dropBase,
+                    background: file ? "rgba(250,76,0,0.05)" : dropBaseBg,
+                  }}
+                  className="flex flex-col items-center justify-center gap-3 w-full py-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all hover:border-[#FA4C00]/40 hover:bg-[#FA4C00]/5"
                 >
                   <input
                     type="file"
@@ -283,18 +351,32 @@ export default function DetalhesTreinamento() {
                     className="hidden"
                     onChange={(e) => setFile(e.target.files[0])}
                   />
-                  <div className={`p-3 rounded-xl ${file ? "bg-[#FA4C00]/15" : "bg-white/5"}`}>
-                    <FileText size={24} className={file ? "text-[#FA4C00]" : "text-white/30"} />
+                  <div
+                    style={{ background: file ? "rgba(250,76,0,0.15)" : dropIconBg }}
+                    className="p-3 rounded-xl"
+                  >
+                    <FileText
+                      size={24}
+                      style={{ color: file ? "#FA4C00" : dropIconColor }}
+                    />
                   </div>
                   {file ? (
                     <div className="text-center">
-                      <p className="text-sm font-medium text-white">{file.name}</p>
-                      <p className="text-xs text-white/40 mt-0.5">{(file.size / 1024).toFixed(0)} KB • clique para trocar</p>
+                      <p className="text-sm font-medium" style={{ color: dropNameColor }}>
+                        {file.name}
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: dropSizeColor }}>
+                        {(file.size / 1024).toFixed(0)} KB • clique para trocar
+                      </p>
                     </div>
                   ) : (
                     <div className="text-center">
-                      <p className="text-sm font-medium text-white/70">Anexar ATA em PDF</p>
-                      <p className="text-xs text-white/30 mt-0.5">Clique para selecionar o arquivo</p>
+                      <p className="text-sm font-medium" style={{ color: dropLabelMuted }}>
+                        Anexar ATA em PDF
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: dropLabelSub }}>
+                        Clique para selecionar o arquivo
+                      </p>
                     </div>
                   )}
                 </label>
@@ -302,9 +384,14 @@ export default function DetalhesTreinamento() {
                 <button
                   onClick={finalizarTreinamento}
                   disabled={uploading || !file}
+                  style={
+                    uploading || !file
+                      ? { background: disabledBg, color: disabledText, cursor: "not-allowed" }
+                      : {}
+                  }
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all ${
                     uploading || !file
-                      ? "bg-white/5 text-white/30 cursor-not-allowed"
+                      ? ""
                       : "bg-[#FA4C00] hover:bg-[#D84300] text-white"
                   }`}
                 >
@@ -327,36 +414,65 @@ export default function DetalhesTreinamento() {
 
       {/* ===================== MODAL EDITAR PARTICIPANTES ===================== */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#1A1A1C] rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-white/10 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.70)", backdropFilter: "blur(4px)" }}>
+          <div
+            style={{ background: modalBg, border: `1px solid ${modalBorder}` }}
+            className="rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl"
+          >
             {/* HEADER MODAL */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+            <div
+              style={{ borderBottom: `1px solid ${modalDivider}` }}
+              className="flex items-center justify-between px-5 py-4"
+            >
               <div className="flex items-center gap-2">
                 <Users size={18} className="text-[#FA4C00]" />
-                <h2 className="font-semibold text-base">Editar Participantes</h2>
+                <h2 className="font-semibold text-base" style={{ color: textMain }}>
+                  Editar Participantes
+                </h2>
               </div>
-              <button onClick={() => setModalOpen(false)} className="text-white/40 hover:text-white transition-colors">
+              <button
+                onClick={() => setModalOpen(false)}
+                style={{ color: metaText }}
+                className="hover:opacity-70 transition-opacity"
+              >
                 <X size={20} />
               </button>
             </div>
 
             {/* FILTROS */}
-            <div className="px-5 py-3 space-y-2 border-b border-white/5">
+            <div
+              style={{ borderBottom: `1px solid ${modalDivider}` }}
+              className="px-5 py-3 space-y-2"
+            >
               <div className="relative">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                <Search
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: inputPlaceholder }}
+                />
                 <input
                   type="text"
                   placeholder="Buscar por nome, CPF ou OPS ID..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#FA4C00]/50"
+                  style={{
+                    background: inputBg,
+                    border: `1px solid ${inputBorder}`,
+                    color: inputText,
+                  }}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FA4C00]/50 placeholder:opacity-40"
                 />
               </div>
               <div className="flex gap-2">
                 <select
                   value={setorFiltro || ""}
                   onChange={(e) => setSetorFiltro(e.target.value || null)}
-                  className="flex-1 px-3 py-2 bg-black/30 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FA4C00]/50 appearance-none"
+                  style={{
+                    background: inputBg,
+                    border: `1px solid ${inputBorder}`,
+                    color: inputText,
+                  }}
+                  className="flex-1 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FA4C00]/50 appearance-none"
                 >
                   <option value="">Todos os setores</option>
                   {setores.map((s) => (
@@ -366,7 +482,12 @@ export default function DetalhesTreinamento() {
                 <select
                   value={turnoFiltro || ""}
                   onChange={(e) => setTurnoFiltro(e.target.value || null)}
-                  className="flex-1 px-3 py-2 bg-black/30 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FA4C00]/50 appearance-none"
+                  style={{
+                    background: inputBg,
+                    border: `1px solid ${inputBorder}`,
+                    color: inputText,
+                  }}
+                  className="flex-1 px-3 py-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FA4C00]/50 appearance-none"
                 >
                   <option value="">Todos os turnos</option>
                   {turnosList.map((t) => (
@@ -374,11 +495,13 @@ export default function DetalhesTreinamento() {
                   ))}
                 </select>
               </div>
-              <div className="flex items-center justify-between text-xs text-white/40">
+              <div className="flex items-center justify-between text-xs" style={{ color: metaText }}>
                 <span>{filtrados.length} colaboradores • {selecionados.length} selecionados</span>
                 <div className="flex gap-3">
-                  <button onClick={selecionarTodos} className="text-[#FA4C00] hover:text-[#FF6B35]">Selecionar todos</button>
-                  <button onClick={limparFiltrados} className="hover:text-white">Limpar</button>
+                  <button onClick={selecionarTodos} className="text-[#FA4C00] hover:text-[#FF6B35]">
+                    Selecionar todos
+                  </button>
+                  <button onClick={limparFiltrados} className="hover:opacity-70">Limpar</button>
                 </div>
               </div>
             </div>
@@ -386,7 +509,9 @@ export default function DetalhesTreinamento() {
             {/* LISTA */}
             <div className="flex-1 overflow-y-auto px-5 py-2">
               {filtrados.length === 0 ? (
-                <p className="text-center text-white/30 text-sm py-8">Nenhum colaborador encontrado</p>
+                <p className="text-center text-sm py-8" style={{ color: metaText }}>
+                  Nenhum colaborador encontrado
+                </p>
               ) : (
                 filtrados.map((c) => {
                   const selected = selecionados.some((p) => p.opsId === c.opsId);
@@ -394,13 +519,20 @@ export default function DetalhesTreinamento() {
                     <button
                       key={c.opsId}
                       onClick={() => toggle(c)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl mb-1 text-sm transition-colors ${
-                        selected ? "bg-[#FA4C00]/15 border border-[#FA4C00]/30" : "hover:bg-white/5 border border-transparent"
-                      }`}
+                      style={
+                        selected
+                          ? { background: "rgba(250,76,0,0.15)", border: "1px solid rgba(250,76,0,0.30)" }
+                          : { border: "1px solid transparent" }
+                      }
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl mb-1 text-sm transition-colors"
+                      onMouseEnter={(e) => !selected && (e.currentTarget.style.background = itemHover)}
+                      onMouseLeave={(e) => !selected && (e.currentTarget.style.background = "transparent")}
                     >
-                      <span className={selected ? "text-white" : "text-white/70"}>{c.nomeCompleto}</span>
+                      <span style={{ color: selected ? textMain : labelColor }}>
+                        {c.nomeCompleto}
+                      </span>
                       <div className="flex items-center gap-3">
-                        <span className="text-white/30 text-xs">{c.opsId}</span>
+                        <span className="text-xs" style={{ color: metaText }}>{c.opsId}</span>
                         {selected && <CheckCircle size={15} className="text-[#FA4C00]" />}
                       </div>
                     </button>
@@ -410,17 +542,21 @@ export default function DetalhesTreinamento() {
             </div>
 
             {/* FOOTER */}
-            <div className="px-5 py-4 border-t border-white/5 flex justify-end gap-3">
+            <div
+              style={{ borderTop: `1px solid ${modalDivider}` }}
+              className="px-5 py-4 flex justify-end gap-3"
+            >
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-sm transition-colors"
+                style={{ background: isDark ? "rgba(255,255,255,0.05)" : "#F3F4F6", color: textMain }}
+                className="px-5 py-2 rounded-xl text-sm transition-colors hover:opacity-80"
               >
                 Cancelar
               </button>
               <button
                 onClick={salvarParticipantes}
                 disabled={salvando}
-                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium text-white transition-colors ${
                   salvando ? "bg-[#FA4C00]/50 cursor-not-allowed" : "bg-[#FA4C00] hover:bg-[#D84300]"
                 }`}
               >

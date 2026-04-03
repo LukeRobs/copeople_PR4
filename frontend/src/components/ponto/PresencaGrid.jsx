@@ -1,6 +1,7 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useContext } from "react";
 import PresencaHeader from "./PresencaHeader";
 import PresencaRow from "./PresencaRow";
+import { ThemeContext } from "../../context/ThemeContext";
 
 export default function PresencaGrid({
   dias = [],
@@ -9,6 +10,7 @@ export default function PresencaGrid({
   canEdit = false,
   isAdmin = false,
 }) {
+  const { isDark } = useContext(ThemeContext);
   const ano = colaboradores?.[0]?.ano ?? null;
   const mes = colaboradores?.[0]?.mes ?? null;
 
@@ -88,8 +90,8 @@ export default function PresencaGrid({
   return (
     <div
       ref={containerRef}
-      className="overflow-x-auto overflow-y-auto max-h-[70vh] rounded-2xl border border-[#2A2A2C] touch-pan-x touch-pan-y w-full scrollbar-hide"
-      style={{ cursor: "grab" }}
+      className="overflow-x-auto overflow-y-auto max-h-[70vh] rounded-2xl touch-pan-x touch-pan-y w-full scrollbar-hide"
+      style={{ cursor: "grab", border: `1px solid ${isDark ? "#2A2A2C" : "#E5E7EB"}` }}
       onMouseDown={onMouseDown}
     >
       <table className="w-max min-w-full text-sm border-separate border-spacing-0">

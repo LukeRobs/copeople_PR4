@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { ThemeContext } from "../../context/ThemeContext";
 import {
   Users,
   TrendingUp,
@@ -86,6 +87,12 @@ export default function DashboardAdmin() {
 
   const navigate = useNavigate();
   const { logout, permissions } = useContext(AuthContext);
+  const { isDark } = useContext(ThemeContext);
+  const cardBg      = isDark ? "#111111" : "#FFFFFF";
+  const cardBorder  = isDark ? "#1F1F1F" : "#E5E7EB";
+  const iconBg      = isDark ? "#1A1A1A" : "#F3F4F6";
+  const labelColor  = isDark ? "#BFBFC3" : "#6B7280";
+  const valueColor  = isDark ? "#FFFFFF" : "#111827";
 
   /* ================= LOAD ================= */
   useEffect(() => {
@@ -320,7 +327,7 @@ export default function DashboardAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: isDark ? "#0D0D0D" : "#F3F4F6", color: isDark ? "#FFFFFF" : "#111827" }}>
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -382,27 +389,22 @@ export default function DashboardAdmin() {
           ">
 
           {/* ================= ESTRUTURA ================= */}
-          <div className="bg-[#111111] rounded-2xl p-6 border border-[#1F1F1F] h-full flex flex-col">
-            <h3 className="text-sm text-[#BFBFC3] mb-8">
+          <div className="rounded-2xl p-6 h-full flex flex-col" style={{ background: cardBg, border: `1px solid ${cardBorder}` }}>
+            <h3 className="text-sm mb-8" style={{ color: labelColor }}>
               Estrutura do Time
             </h3>
 
-            <div className="
-              grid
-              grid-cols-1
-              md:grid-cols-2
-              gap-6
-            ">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {kpisEstrutura.map((item, idx) => {
                 const Icon = item.icon;
                 return (
                   <div key={idx} className="flex items-center gap-4 min-h-16">
-                    <div className="w-12 h-12 rounded-xl bg-[#1A1A1A] flex items-center justify-center">
-                      <Icon size={20} className="text-[#BFBFC3]" />
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: iconBg }}>
+                      <Icon size={20} style={{ color: labelColor }} />
                     </div>
                     <div>
-                      <p className="text-sm text-[#BFBFC3] leading-tight">{item.label}</p>
-                      <p className="text-2xl font-semibold text-white">
+                      <p className="text-sm leading-tight" style={{ color: labelColor }}>{item.label}</p>
+                      <p className="text-2xl font-semibold" style={{ color: item.color || valueColor }}>
                         {item.value}
                       </p>
                     </div>
@@ -413,32 +415,23 @@ export default function DashboardAdmin() {
           </div>
 
           {/* ================= PERFORMANCE ================= */}
-          <div className="bg-[#111111] rounded-2xl p-6 border border-[#1F1F1F] h-full flex flex-col">
-            <h3 className="text-sm text-[#BFBFC3] mb-8">
+          <div className="rounded-2xl p-6 h-full flex flex-col" style={{ background: cardBg, border: `1px solid ${cardBorder}` }}>
+            <h3 className="text-sm mb-8" style={{ color: labelColor }}>
               Performance Operacional
             </h3>
 
-            <div className="
-              grid
-              grid-cols-1
-              md:grid-cols-2
-              gap-6
-            ">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {kpisPerformance.map((item, idx) => {
                 const Icon = item.icon;
                 return (
                   <div key={idx} className="flex items-center gap-4 min-h-16">
-                    <div className="w-12 h-12 rounded-xl bg-[#1A1A1A] flex items-center justify-center">
-                      <Icon size={20} className={item.color || "text-[#BFBFC3]"} />
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: iconBg }}>
+                      <Icon size={20} style={{ color: item.color || labelColor }} />
                     </div>
                     <div>
-                      <p className="text-sm text-[#BFBFC3] leading-tight">{item.label}</p>
-                      <p
-                        className="text-2xl font-semibold"
-                        style={{ color: item.color || "white" }}
-                      >
-                        {item.value}
-                        {item.suffix || ""}
+                      <p className="text-sm leading-tight" style={{ color: labelColor }}>{item.label}</p>
+                      <p className="text-2xl font-semibold" style={{ color: item.color || valueColor }}>
+                        {item.value}{item.suffix || ""}
                       </p>
                     </div>
                   </div>
@@ -448,32 +441,23 @@ export default function DashboardAdmin() {
           </div>
 
           {/* ================= PESSOAS ================= */}
-          <div className="bg-[#111111] rounded-2xl p-6 border border-[#1F1F1F] h-full flex flex-col">
-            <h3 className="text-sm text-[#BFBFC3] mb-8">
+          <div className="rounded-2xl p-6 h-full flex flex-col" style={{ background: cardBg, border: `1px solid ${cardBorder}` }}>
+            <h3 className="text-sm mb-8" style={{ color: labelColor }}>
               Pessoas & Saúde
             </h3>
 
-            <div className="
-              grid
-              grid-cols-1
-              md:grid-cols-2
-              gap-6
-            ">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {kpisPessoas.map((item, idx) => {
                 const Icon = item.icon;
                 return (
                   <div key={idx} className="flex items-center gap-4 min-h-16">
-                    <div className="w-12 h-12 rounded-xl bg-[#1A1A1A] flex items-center justify-center">
-                      <Icon size={20} className={item.color || "text-[#BFBFC3]"} />
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: iconBg }}>
+                      <Icon size={20} style={{ color: item.color || labelColor }} />
                     </div>
                     <div>
-                      <p className="text-sm text-[#BFBFC3] leading-tight">{item.label}</p>
-                      <p
-                        className="text-2xl font-semibold"
-                        style={{ color: item.color || "white" }}
-                      >
-                        {item.value}
-                        {item.suffix || ""}
+                      <p className="text-sm leading-tight" style={{ color: labelColor }}>{item.label}</p>
+                      <p className="text-2xl font-semibold" style={{ color: item.color || valueColor }}>
+                        {item.value}{item.suffix || ""}
                       </p>
                     </div>
                   </div>

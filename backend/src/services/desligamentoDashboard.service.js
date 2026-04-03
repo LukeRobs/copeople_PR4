@@ -1,18 +1,19 @@
 const { prisma } = require("../config/database");
 
 function buildWhere({ inicio, fim, empresa, turno, setor, lider }) {
+  // Busca colaboradores INATIVO (com ou sem dataDesligamento)
   const where = {
-    dataDesligamento: {
-      not: null,
-    },
+    status: "INATIVO",
   };
 
   if (inicio && fim) {
-    where.dataDesligamento = {
-      not: null,
-      gte: new Date(inicio),
-      lt: new Date(new Date(fim).getTime() + 86400000),
-    };
+    const gte = new Date(inicio);
+    const lt  = new Date(new Date(fim).getTime() + 86400000);
+    // Inclui quem tem data dentro do range OU quem não tem data de desligamento
+    where.OR = [
+      { dataDesligamento: { gte, lt } },
+      { dataDesligamento: null },
+    ];
   }
 
   if (empresa) where.idEmpresa = Number(empresa);

@@ -1,10 +1,6 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { useContext } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { ThemeContext } from "../../context/ThemeContext";
 
 const COLORS = ["#FA4C00", "#0A84FF"];
 
@@ -12,10 +8,15 @@ export default function DistribuicaoColaboradoresCadastradosChart({
   title = "Colaboradores Ativos",
   data = [],
 }) {
-  const dataAtivos = data.filter(
-    (d) => d.status === "ATIVO" || d.status === undefined
-  );
+  const { isDark } = useContext(ThemeContext);
 
+  const cardBg    = isDark ? "#1A1A1C" : "#FFFFFF";
+  const textMain  = isDark ? "#FFFFFF" : "#111827";
+  const textMuted = isDark ? "#BFBFC3" : "#6B7280";
+  const ttBg      = isDark ? "#232323" : "#FFFFFF";
+  const ttBorder  = isDark ? "#2A2A2C" : "#E5E7EB";
+
+  const dataAtivos = data.filter((d) => d.status === "ATIVO" || d.status === undefined);
   const totalAtivos = dataAtivos.reduce((s, d) => s + d.value, 0);
 
   const renderLabel = ({ value, percent }) => {
@@ -24,75 +25,43 @@ export default function DistribuicaoColaboradoresCadastradosChart({
   };
 
   return (
-    <div className="bg-[#1A1A1C] rounded-2xl p-4 sm:p-6 space-y-4 w-full">
-      <h3 className="text-xs sm:text-sm font-semibold text-[#BFBFC3] uppercase tracking-wide">
+    <div style={{ background: cardBg, borderRadius: 16, padding: 20, width: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
+      <h3 style={{ fontSize: 11, fontWeight: 600, color: textMuted, textTransform: "uppercase", letterSpacing: "0.10em", margin: 0 }}>
         {title}
       </h3>
 
-      {/* 🔥 ALTURA RESPONSIVA */}
-      <div className="h-60 sm:h-[280px] lg:h-80 relative">
+      <div style={{ height: 280, position: "relative" }}>
         {/* TOTAL CENTRAL */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
-            {totalAtivos}
-          </span>
-          <span className="text-[10px] sm:text-xs text-[#BFBFC3] tracking-wide">
-            ATIVOS
-          </span>
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+          <span style={{ fontSize: 36, fontWeight: 700, color: textMain, lineHeight: 1 }}>{totalAtivos}</span>
+          <span style={{ fontSize: 10, color: textMuted, letterSpacing: "0.12em", marginTop: 4 }}>ATIVOS</span>
         </div>
 
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie
-              data={dataAtivos}
-              dataKey="value"
-              nameKey="name"
-              innerRadius="60%"
-              outerRadius="85%"
-              paddingAngle={3}
-              label={renderLabel}
-              labelLine={false}
-            >
-              {dataAtivos.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
+            <Pie data={dataAtivos} dataKey="value" nameKey="name"
+              innerRadius="60%" outerRadius="85%" paddingAngle={3}
+              label={renderLabel} labelLine={false}>
+              {dataAtivos.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
             </Pie>
-
             <Tooltip
               formatter={(v, _, props) => {
-                const pct = totalAtivos
-                  ? Math.round((v / totalAtivos) * 100)
-                  : 0;
+                const pct = totalAtivos ? Math.round((v / totalAtivos) * 100) : 0;
                 return [`${v} (${pct}%)`, props.payload.name];
               }}
-              contentStyle={{
-                backgroundColor: "#FFFFFF",
-                border: "1px solid #2A2A2C",
-                borderRadius: 8,
-              }}
-              labelStyle={{ color: "#BFBFC3" }}
+              contentStyle={{ backgroundColor: ttBg, border: `1px solid ${ttBorder}`, borderRadius: 8, color: textMain }}
             />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      {/* 🔥 LEGENDA RESPONSIVA */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 12 }}>
         {dataAtivos.map((d, i) => {
-          const pct = totalAtivos
-            ? Math.round((d.value / totalAtivos) * 100)
-            : 0;
-
+          const pct = totalAtivos ? Math.round((d.value / totalAtivos) * 100) : 0;
           return (
-            <div key={d.name} className="flex items-center gap-2 min-w-0">
-              <span
-                className="w-3 h-3 rounded-full shrink-0"
-                style={{ backgroundColor: COLORS[i % COLORS.length] }}
-              />
-              <span className="text-[#BFBFC3] truncate">
+            <div key={d.name} style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+              <span style={{ width: 12, height: 12, borderRadius: "50%", flexShrink: 0, backgroundColor: COLORS[i % COLORS.length] }} />
+              <span style={{ color: textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {d.name} — {d.value} ({pct}%)
               </span>
             </div>

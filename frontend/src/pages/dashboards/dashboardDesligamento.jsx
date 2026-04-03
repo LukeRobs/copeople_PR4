@@ -52,24 +52,26 @@ function toChartData(obj = {}) {
 
 /* ─── CUSTOM TOOLTIP ─────────────────────────────────────────────── */
 function CustomTooltip({ active, payload, label }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!active || !payload?.length) return null
   return (
     <div
       style={{
-        background: "#1A1A1A",
-        border: "1px solid rgba(255,255,255,0.10)",
+        background: isDark ? "#1A1A1A" : "#FFFFFF",
+        border: `1px solid ${T.border}`,
         borderRadius: 12,
         padding: "10px 16px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
       }}
     >
       {label && (
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginBottom: 4 }}>
+        <p style={{ color: T.textMuted, fontSize: 11, marginBottom: 4 }}>
           {label}
         </p>
       )}
       {payload.map((p, i) => (
-        <p key={i} style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: 0 }}>
+        <p key={i} style={{ color: T.textMain, fontSize: 14, fontWeight: 600, margin: 0 }}>
           <span style={{ color: p.color || BRAND }}>● </span>
           {p.value}
         </p>
@@ -80,10 +82,11 @@ function CustomTooltip({ active, payload, label }) {
 
 /* ─── SKELETON ───────────────────────────────────────────────────── */
 function Skeleton({ style = {} }) {
+  const { isDark } = useContext(ThemeContext)
   return (
     <div
       style={{
-        background: "rgba(255,255,255,0.05)",
+        background: isDark ? "rgba(255,255,255,0.05)" : "#E5E7EB",
         borderRadius: 10,
         animation: "pulse 1.5s ease-in-out infinite",
         ...style,
@@ -94,6 +97,8 @@ function Skeleton({ style = {} }) {
 
 /* ─── EMPTY ──────────────────────────────────────────────────────── */
 function Empty() {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   return (
     <div
       style={{
@@ -101,7 +106,7 @@ function Empty() {
         alignItems: "center",
         justifyContent: "center",
         height: 160,
-        color: "rgba(255,255,255,0.18)",
+        color: T.textSubtle,
         fontSize: 13,
       }}
     >
@@ -376,15 +381,20 @@ function TurnoSelector({ value, onChange }) {
 
 /* ─── CHARTS ─────────────────────────────────────────────────────── */
 function BarBlock({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!data?.length) return <Empty />
-  const sorted = [...data].sort((a, b) => b.value - a.value)
+  const sorted     = [...data].sort((a, b) => b.value - a.value)
+  const tickColor  = isDark ? "#4B4B4B" : "#9CA3AF"
+  const gridColor  = isDark ? "rgba(255,255,255,0.04)" : "#E5E7EB"
+  const labelColor = isDark ? "rgba(255,255,255,0.5)" : "#374151"
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={sorted} margin={{ top: 22, right: 16, bottom: 0, left: -12 }}>
-        <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
+        <CartesianGrid stroke={gridColor} vertical={false} />
         <XAxis
           dataKey="name"
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
+          tick={{ fill: tickColor, fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           tickMargin={8}
@@ -392,14 +402,14 @@ function BarBlock({ data }) {
         />
         <YAxis
           allowDecimals={false}
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
+          tick={{ fill: tickColor, fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           width={26}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "#F3F4F6" }} />
         <Bar dataKey="value" fill={BRAND} radius={[6, 6, 0, 0]} maxBarSize={44}>
-          <LabelList dataKey="value" position="top" style={{ fill: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600 }} />
+          <LabelList dataKey="value" position="top" style={{ fill: labelColor, fontSize: 11, fontWeight: 600 }} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
@@ -407,13 +417,19 @@ function BarBlock({ data }) {
 }
 
 function BarBlockH({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!data?.length) return <Empty />
   const fmt = (n = "") => {
     const p = String(n).trim().split(" ")
     return p.length >= 2 ? `${p[0]} ${p[1]}` : n
   }
-  const sorted = [...data].sort((a, b) => b.value - a.value)
-  const h = Math.max(280, sorted.length * 40)
+  const sorted     = [...data].sort((a, b) => b.value - a.value)
+  const h          = Math.max(280, sorted.length * 40)
+  const tickColor  = isDark ? "#4B4B4B" : "#9CA3AF"
+  const yTickColor = isDark ? "#888" : "#6B7280"
+  const gridColor  = isDark ? "rgba(255,255,255,0.04)" : "#E5E7EB"
+  const labelColor = isDark ? "rgba(255,255,255,0.45)" : "#374151"
   return (
     <ResponsiveContainer width="100%" height={h}>
       <BarChart
@@ -421,24 +437,24 @@ function BarBlockH({ data }) {
         data={sorted.map((d) => ({ ...d, name: fmt(d.name) }))}
         margin={{ top: 0, right: 36, bottom: 0, left: 0 }}
       >
-        <CartesianGrid stroke="rgba(255,255,255,0.04)" horizontal={false} />
+        <CartesianGrid stroke={gridColor} horizontal={false} />
         <XAxis
           type="number"
-          tick={{ fill: "#4B4B4B", fontSize: 11 }}
+          tick={{ fill: tickColor, fontSize: 11 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
           dataKey="name"
           type="category"
-          tick={{ fill: "#888", fontSize: 12 }}
+          tick={{ fill: yTickColor, fontSize: 12 }}
           axisLine={false}
           tickLine={false}
           width={110}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "#F3F4F6" }} />
         <Bar dataKey="value" fill={BRAND} radius={[0, 6, 6, 0]} maxBarSize={20}>
-          <LabelList dataKey="value" position="right" style={{ fill: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600 }} />
+          <LabelList dataKey="value" position="right" style={{ fill: labelColor, fontSize: 11, fontWeight: 600 }} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
@@ -446,6 +462,8 @@ function BarBlockH({ data }) {
 }
 
 function PieBlock({ data }) {
+  const { isDark } = useContext(ThemeContext)
+  const T = THEME[isDark ? "dark" : "light"]
   if (!data?.length) return <Empty />
   const total = data.reduce((a, b) => a + b.value, 0)
   return (
@@ -480,8 +498,8 @@ function PieBlock({ data }) {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: 0, lineHeight: 1 }}>{total}</p>
-          <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", margin: "3px 0 0" }}>total</p>
+          <p style={{ fontSize: 24, fontWeight: 800, color: T.textMain, margin: 0, lineHeight: 1 }}>{total}</p>
+          <p style={{ fontSize: 10, color: T.textSubtle, margin: "3px 0 0" }}>total</p>
         </div>
       </div>
       {/* legend */}
@@ -491,7 +509,7 @@ function PieBlock({ data }) {
           return (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: CHART_COLORS[i % CHART_COLORS.length], flexShrink: 0 }} />
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>{d.name}</span>
+              <span style={{ fontSize: 11, color: T.textMuted }}>{d.name}</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: CHART_COLORS[i % CHART_COLORS.length] }}>
                 {d.value} ({pct}%)
               </span>
@@ -585,7 +603,7 @@ export default function DashboardDesligamento() {
                   Dashboard de Desligamentos
                 </h1>
               </div>
-              <p style={{ margin: "0 0 0 14px", fontSize: 13, color: "rgba(255,255,255,0.35)" }}>
+              <p style={{ margin: "0 0 0 14px", fontSize: 13, color: T.textMuted }}>
                 Dados consolidados de turnover — motivos, perfil e lideranças
               </p>
             </div>

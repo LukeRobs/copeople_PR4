@@ -1,92 +1,70 @@
+import { useContext } from "react";
+import { ThemeContext } from "../../context/ThemeContext";
+
 export default function StatusColaboradoresSection({
   title = "Status dos Colaboradores",
   items = [],
   footer = "",
 }) {
+  const { isDark } = useContext(ThemeContext);
+
+  const cardBg    = isDark ? "#1A1A1C" : "#FFFFFF";
+  const rowBg     = isDark ? "#121214" : "#F9FAFB";
+  const border    = isDark ? "#2A2A2C" : "#E5E7EB";
+  const textMuted = isDark ? "#BFBFC3" : "#6B7280";
+
   if (!items || items.length === 0) return null;
 
-  const total = items.reduce(
-    (acc, cur) => acc + (cur.value ?? cur.quantidade ?? 0),
-    0
-  );
+  const total = items.reduce((acc, cur) => acc + (cur.value ?? cur.quantidade ?? 0), 0);
 
   const getColor = (label) => {
     const l = String(label).toUpperCase();
-    if (l.includes("ATIVO")) return "#34C759";
-    if (l.includes("FÉR")) return "#0A84FF";
-    if (l.includes("AFAST")) return "#AF52DE";
-    if (l.includes("INSS")) return "#FF6B00";
-    if (l.includes("INAT")) return "#8E8E93";
+    if (l.includes("ATIVO"))  return "#34C759";
+    if (l.includes("FÉR"))    return "#0A84FF";
+    if (l.includes("AFAST"))  return "#AF52DE";
+    if (l.includes("INSS"))   return "#FF6B00";
+    if (l.includes("INAT"))   return "#8E8E93";
     return "#FA4C00";
   };
 
   return (
-    <div className="bg-[#1A1A1C] border border-[#2A2A2C] rounded-2xl p-6 space-y-6">
+    <div style={{ background: cardBg, border: `1px solid ${border}`, borderRadius: 16, padding: 24, display: "flex", flexDirection: "column", gap: 24 }}>
       {title && (
-        <h2 className="text-xs sm:text-sm font-semibold text-[#BFBFC3] uppercase tracking-wide">
+        <h2 style={{ fontSize: 11, fontWeight: 600, color: textMuted, textTransform: "uppercase", letterSpacing: "0.10em", margin: 0 }}>
           {title}
         </h2>
       )}
 
-      <div className="space-y-4">
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {items.map((item, i) => {
           const label = item.label ?? item.status ?? "-";
           const value = item.value ?? item.quantidade ?? 0;
-
-          const percentage =
-            total > 0 ? (value / total) * 100 : 0;
-
+          const percentage = total > 0 ? (value / total) * 100 : 0;
           const color = getColor(label);
-
           const circumference = 2 * Math.PI * 18;
-          const offset =
-            circumference - (percentage / 100) * circumference;
+          const offset = circumference - (percentage / 100) * circumference;
 
           return (
-            <div
-              key={`${label}-${i}`}
-              className="flex items-center justify-between bg-[#121214] border border-[#2A2A2C] rounded-xl px-6 py-5 hover:border-[#3A3A3C] transition"
+            <div key={`${label}-${i}`}
+              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: rowBg, border: `1px solid ${border}`, borderRadius: 12, padding: "16px 24px" }}
             >
-              {/* Label */}
-              <div className="text-sm text-[#BFBFC3] w-40">
-                {label}
-              </div>
+              <div style={{ fontSize: 13, color: textMuted, width: 160 }}>{label}</div>
 
-              {/* Número */}
-              <div
-                className="text-3xl font-semibold text-center flex-1"
-                style={{ color }}
-              >
+              <div style={{ fontSize: 30, fontWeight: 600, color, flex: 1, textAlign: "center" }}>
                 {value}
               </div>
 
-              {/* Indicador circular */}
-              <div className="relative w-12 h-12 flex items-center justify-center">
+              <div style={{ position: "relative", width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="44" height="44">
-                  <circle
-                    cx="22"
-                    cy="22"
-                    r="18"
-                    stroke="#2A2A2C"
-                    strokeWidth="4"
-                    fill="none"
-                  />
+                  <circle cx="22" cy="22" r="18" stroke={isDark ? "#2A2A2C" : "#E5E7EB"} strokeWidth="4" fill="none" />
                   {percentage > 0 && (
-                    <circle
-                      cx="22"
-                      cy="22"
-                      r="18"
-                      stroke={color}
-                      strokeWidth="4"
-                      fill="none"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={offset}
-                      strokeLinecap="round"
-                      transform="rotate(-90 22 22)"
+                    <circle cx="22" cy="22" r="18" stroke={color} strokeWidth="4" fill="none"
+                      strokeDasharray={circumference} strokeDashoffset={offset}
+                      strokeLinecap="round" transform="rotate(-90 22 22)"
                     />
                   )}
                 </svg>
-                <div className="absolute text-[11px] text-[#BFBFC3] font-medium">
+                <div style={{ position: "absolute", fontSize: 11, color: textMuted, fontWeight: 500 }}>
                   {percentage.toFixed(1)}%
                 </div>
               </div>
@@ -96,7 +74,7 @@ export default function StatusColaboradoresSection({
       </div>
 
       {footer && (
-        <div className="pt-4 border-t border-[#2A2A2C] text-sm text-[#BFBFC3]">
+        <div style={{ paddingTop: 16, borderTop: `1px solid ${border}`, fontSize: 13, color: textMuted }}>
           {footer}
         </div>
       )}

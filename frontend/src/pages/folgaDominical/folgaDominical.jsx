@@ -22,6 +22,100 @@ const RED     = "#EF4444"
 const YELLOW  = "#F59E0B"
 const BLUE    = "#3B82F6"
 
+/* ─── THEME ───────────────────────────────────────────────────────── */
+const THEME = {
+  dark: {
+    card:            "#141414",
+    cardBorder:      "rgba(255,255,255,0.06)",
+    labelSm:         "rgba(255,255,255,0.28)",
+    labelXs:         "rgba(255,255,255,0.20)",
+    value:           "#fff",
+    sub:             "rgba(255,255,255,0.28)",
+    kpiLabel:        "rgba(255,255,255,0.35)",
+    theadBg:         "#111",
+    theadText:       "rgba(255,255,255,0.30)",
+    theadBorder:     "rgba(255,255,255,0.06)",
+    tdText:          "rgba(255,255,255,0.72)",
+    tdBorder:        "rgba(255,255,255,0.04)",
+    selectBg:        "#1c1c1c",
+    selectBorder:    "rgba(255,255,255,0.08)",
+    selectText:      "#fff",
+    inputBg:         "#1c1c1c",
+    inputBorder:     "rgba(255,255,255,0.08)",
+    inputText:       "#fff",
+    btnBg:           "#1c1c1c",
+    btnText:         "#fff",
+    btnBorder:       "rgba(255,255,255,0.08)",
+    btnBorderHover:  "rgba(255,255,255,0.20)",
+    clearBg:         "rgba(255,255,255,0.06)",
+    clearText:       "rgba(255,255,255,0.50)",
+    clearHover:      "rgba(255,255,255,0.10)",
+    filterIcon:      "rgba(255,255,255,0.30)",
+    tableBorder:     "rgba(255,255,255,0.06)",
+    rowHover:        "rgba(255,255,255,0.025)",
+    nameText:        "#fff",
+    dateText:        "#fff",
+    altText:         "rgba(255,255,255,0.45)",
+    sectionBorder:   "rgba(255,255,255,0.06)",
+    sectionSubtitle: "rgba(255,255,255,0.30)",
+    itemBg:          "#111",
+    itemText:        "#fff",
+    itemSub:         "rgba(255,255,255,0.35)",
+    disabledBtn:     "#2a2a2a",
+    empty:           "rgba(255,255,255,0.20)",
+    capDateText:     "rgba(255,255,255,0.40)",
+    barTrack:        "rgba(255,255,255,0.06)",
+    pageSubtitle:    "rgba(255,255,255,0.32)",
+    anoLabel:        "rgba(255,255,255,0.30)",
+    previewMeta:     "rgba(255,255,255,0.28)",
+  },
+  light: {
+    card:            "#FFFFFF",
+    cardBorder:      "#E5E7EB",
+    labelSm:         "#6B7280",
+    labelXs:         "#9CA3AF",
+    value:           "#111827",
+    sub:             "#6B7280",
+    kpiLabel:        "#6B7280",
+    theadBg:         "#F9FAFB",
+    theadText:       "#6B7280",
+    theadBorder:     "#E5E7EB",
+    tdText:          "#374151",
+    tdBorder:        "#F3F4F6",
+    selectBg:        "#FFFFFF",
+    selectBorder:    "#D1D5DB",
+    selectText:      "#111827",
+    inputBg:         "#FFFFFF",
+    inputBorder:     "#D1D5DB",
+    inputText:       "#111827",
+    btnBg:           "#FFFFFF",
+    btnText:         "#374151",
+    btnBorder:       "#D1D5DB",
+    btnBorderHover:  "#9CA3AF",
+    clearBg:         "#F3F4F6",
+    clearText:       "#6B7280",
+    clearHover:      "#E5E7EB",
+    filterIcon:      "#9CA3AF",
+    tableBorder:     "#E5E7EB",
+    rowHover:        "#F9FAFB",
+    nameText:        "#111827",
+    dateText:        "#111827",
+    altText:         "#9CA3AF",
+    sectionBorder:   "#E5E7EB",
+    sectionSubtitle: "#6B7280",
+    itemBg:          "#F9FAFB",
+    itemText:        "#111827",
+    itemSub:         "#6B7280",
+    disabledBtn:     "#E5E7EB",
+    empty:           "#9CA3AF",
+    capDateText:     "#9CA3AF",
+    barTrack:        "#E5E7EB",
+    pageSubtitle:    "#6B7280",
+    anoLabel:        "#6B7280",
+    previewMeta:     "#6B7280",
+  },
+};
+
 /* ─── STATIC DATA ─────────────────────────────────────────────────── */
 const MESES = [
   { value: 1,  label: "Janeiro"   },
@@ -50,10 +144,8 @@ function formatDateBR(dateStr) {
 }
 function formatDateWithWeekday(dateStr) {
   if (!dateStr) return "-";
-
-  const iso = String(dateStr).slice(0, 10); // YYYY-MM-DD
+  const iso = String(dateStr).slice(0, 10);
   const d = new Date(iso + "T12:00:00");
-
   return d.toLocaleDateString("pt-BR", {
     weekday: "short",
     day: "2-digit",
@@ -95,6 +187,8 @@ function Sk({ h = 40, w = "100%", r = 10 }) {
 
 /* ─── SECTION LABEL ───────────────────────────────────────────────── */
 function SectionLabel({ num, title, sub }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 2 }}>
       <span style={{
@@ -104,10 +198,10 @@ function SectionLabel({ num, title, sub }) {
       }}>{num}</span>
       <div>
         <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em",
-          textTransform: "uppercase", color: "rgba(255,255,255,0.28)" }}>
+          textTransform: "uppercase", color: T.labelSm }}>
           {title}
         </p>
-        {sub && <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.20)" }}>{sub}</p>}
+        {sub && <p style={{ margin: 0, fontSize: 11, color: T.labelXs }}>{sub}</p>}
       </div>
     </div>
   )
@@ -115,10 +209,12 @@ function SectionLabel({ num, title, sub }) {
 
 /* ─── CARD ────────────────────────────────────────────────────────── */
 function SurfaceCard({ children, style = {} }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
   return (
     <div style={{
-      background: "#141414",
-      border: "1px solid rgba(255,255,255,0.06)",
+      background: T.card,
+      border: `1px solid ${T.cardBorder}`,
       borderRadius: 18,
       padding: "22px 24px",
       ...style,
@@ -130,12 +226,14 @@ function SurfaceCard({ children, style = {} }) {
 
 /* ─── KPI CARD ────────────────────────────────────────────────────── */
 function KpiCard({ label, value, icon: Icon, color = BRAND, sub, onClick, active, loading }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
   return (
     <div
       onClick={onClick}
       style={{
-        background: active ? `${color}12` : "#141414",
-        border: `1px solid ${active ? color : "rgba(255,255,255,0.06)"}`,
+        background: active ? `${color}12` : T.card,
+        border: `1px solid ${active ? color : T.cardBorder}`,
         borderRadius: 16,
         padding: "16px 18px",
         cursor: onClick ? "pointer" : "default",
@@ -144,7 +242,7 @@ function KpiCard({ label, value, icon: Icon, color = BRAND, sub, onClick, active
         overflow: "hidden",
       }}
       onMouseEnter={(e) => onClick && (e.currentTarget.style.borderColor = color)}
-      onMouseLeave={(e) => onClick && !active && (e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)")}
+      onMouseLeave={(e) => onClick && !active && (e.currentTarget.style.borderColor = T.cardBorder)}
     >
       {/* accent bar */}
       <div style={{
@@ -154,18 +252,18 @@ function KpiCard({ label, value, icon: Icon, color = BRAND, sub, onClick, active
       }} />
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
         <div style={{ minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.35)",
+          <p style={{ margin: 0, fontSize: 11, color: T.kpiLabel,
             fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
             {label}
           </p>
           {loading
             ? <Sk h={28} w={60} />
             : <p style={{ margin: 0, fontSize: 26, fontWeight: 800, lineHeight: 1,
-                color: active ? color : "#fff" }}>
+                color: active ? color : T.value }}>
                 {value ?? "—"}
               </p>
           }
-          {sub && <p style={{ margin: "5px 0 0", fontSize: 11, color: "rgba(255,255,255,0.28)" }}>{sub}</p>}
+          {sub && <p style={{ margin: "5px 0 0", fontSize: 11, color: T.sub }}>{sub}</p>}
         </div>
         {Icon && (
           <div style={{
@@ -182,7 +280,7 @@ function KpiCard({ label, value, icon: Icon, color = BRAND, sub, onClick, active
 }
 
 /* ─── BADGE ───────────────────────────────────────────────────────── */
-const TURNO_COLORS = { T1: "#3B82F6", T2: BRAND, T3: "#A855F7" }
+const TURNO_COLORS  = { T1: "#3B82F6", T2: BRAND, T3: "#A855F7" }
 const ESCALA_COLORS = { B: "#22C55E", C: "#F59E0B", G: "#EC4899" }
 
 function Badge({ value, map }) {
@@ -201,7 +299,9 @@ function Badge({ value, map }) {
 
 /* ─── DIAS SEM FOLGA BADGE ────────────────────────────────────────── */
 function DiasBadge({ dias }) {
-  if (dias == null) return <span style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
+  if (dias == null) return <span style={{ color: T.empty }}>—</span>
   const color = dias >= 30 ? RED : dias >= 20 ? YELLOW : GREEN
   return (
     <span style={{
@@ -235,18 +335,22 @@ function AlertBanner({ type = "error", children }) {
 }
 
 /* ─── SELECT ──────────────────────────────────────────────────────── */
-function StyledSelect({ value, onChange, children, placeholder }) {
+function StyledSelect({ value, onChange, children }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
       style={{
-        background: "#1c1c1c", border: "1px solid rgba(255,255,255,0.08)",
-        color: "#fff", fontSize: 13, borderRadius: 12, padding: "9px 14px",
+        background: T.selectBg,
+        border: `1px solid ${T.selectBorder}`,
+        color: T.selectText,
+        fontSize: 13, borderRadius: 12, padding: "9px 14px",
         outline: "none", cursor: "pointer", transition: "border-color 0.2s",
       }}
       onFocus={(e)  => (e.target.style.borderColor = `${BRAND}60`)}
-      onBlur={(e)   => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
+      onBlur={(e)   => (e.target.style.borderColor = T.selectBorder)}
     >
       {children}
     </select>
@@ -255,13 +359,15 @@ function StyledSelect({ value, onChange, children, placeholder }) {
 
 /* ─── TABLE HEADER CELL ───────────────────────────────────────────── */
 function TH({ children, center = false }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
   return (
     <th style={{
       padding: "12px 16px", fontSize: 11, fontWeight: 700,
-      color: "rgba(255,255,255,0.30)", textTransform: "uppercase",
+      color: T.theadText, textTransform: "uppercase",
       letterSpacing: "0.08em", textAlign: center ? "center" : "left",
-      whiteSpace: "nowrap", background: "#111",
-      borderBottom: "1px solid rgba(255,255,255,0.06)",
+      whiteSpace: "nowrap", background: T.theadBg,
+      borderBottom: `1px solid ${T.theadBorder}`,
     }}>
       {children}
     </th>
@@ -270,12 +376,14 @@ function TH({ children, center = false }) {
 
 /* ─── TABLE DATA CELL ─────────────────────────────────────────────── */
 function TD({ children, center = false, style = {} }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
   return (
     <td style={{
       padding: "11px 16px", fontSize: 13,
-      color: "rgba(255,255,255,0.72)",
+      color: T.tdText,
       textAlign: center ? "center" : "left",
-      borderBottom: "1px solid rgba(255,255,255,0.04)",
+      borderBottom: `1px solid ${T.tdBorder}`,
       ...style,
     }}>
       {children}
@@ -285,10 +393,13 @@ function TD({ children, center = false, style = {} }) {
 
 /* ─── CAPACIDADE MINI CARD ────────────────────────────────────────── */
 function CapacidadeCard({ turno, dias }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
   const color = TURNO_COLORS[turno] || BRAND
   return (
     <div style={{
-      background: "#111", border: "1px solid rgba(255,255,255,0.06)",
+      background: T.itemBg,
+      border: `1px solid ${T.cardBorder}`,
       borderRadius: 14, padding: "16px 18px",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -299,7 +410,7 @@ function CapacidadeCard({ turno, dias }) {
         }}>
           <Clock size={13} color={color} />
         </span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{turno}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: T.nameText }}>{turno}</span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -311,7 +422,7 @@ function CapacidadeCard({ turno, dias }) {
           return (
             <div key={data}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.40)" }}>
+                <span style={{ fontSize: 11, color: T.capDateText }}>
                   {formatDateBR(data)}
                 </span>
                 <span style={{
@@ -321,7 +432,7 @@ function CapacidadeCard({ turno, dias }) {
                   {planejadas} / {capacidade}
                 </span>
               </div>
-              <div style={{ height: 4, borderRadius: 4, background: "rgba(255,255,255,0.06)" }}>
+              <div style={{ height: 4, borderRadius: 4, background: T.barTrack }}>
                 <div style={{
                   height: "100%", width: `${pct}%`, borderRadius: 4,
                   background: barColor, transition: "width 0.5s ease",
@@ -338,8 +449,9 @@ function CapacidadeCard({ turno, dias }) {
 /* ─── MAIN ────────────────────────────────────────────────────────── */
 export default function FolgaDominicalPage() {
   const navigate = useNavigate();
-  const { user }  = useContext(AuthContext);
-  const { isDark } = useContext(ThemeContext);
+  const { user }    = useContext(AuthContext);
+  const { isDark }  = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
 
   const isAdmin     = user?.role === "ADMIN";
   const isLideranca = user?.role === "LIDERANCA";
@@ -423,15 +535,12 @@ export default function FolgaDominicalPage() {
 
   const lideres = useMemo(() => {
     if (!resumo?.colaboradores) return [];
-
     const unique = new Set(
-      resumo.colaboradores
-        .map((c) => c.lider)
-        .filter(Boolean)
+      resumo.colaboradores.map((c) => c.lider).filter(Boolean)
     );
-
     return Array.from(unique).sort();
   }, [resumo]);
+
   const colaboradoresFiltrados = useMemo(() => {
     if (!resumo?.colaboradores) return [];
     return resumo.colaboradores.filter((c) => {
@@ -478,7 +587,7 @@ export default function FolgaDominicalPage() {
                   Projeção de Folgas Dominicais
                 </h1>
               </div>
-              <p style={{ margin: "0 0 0 14px", fontSize: 13, color: "rgba(255,255,255,0.32)" }}>
+              <p style={{ margin: "0 0 0 14px", fontSize: 13, color: T.pageSubtitle }}>
                 Distribuição automática de DSR aos domingos — Escalas B, C e G
               </p>
             </div>
@@ -487,16 +596,17 @@ export default function FolgaDominicalPage() {
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 10 }}>
               {/* Ano */}
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label style={{ fontSize: 10, color: "rgba(255,255,255,0.30)", fontWeight: 700,
+                <label style={{ fontSize: 10, color: T.anoLabel, fontWeight: 700,
                   textTransform: "uppercase", letterSpacing: "0.12em" }}>Ano</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 8,
-                  background: "#1c1c1c", border: "1px solid rgba(255,255,255,0.08)",
+                  background: T.inputBg,
+                  border: `1px solid ${T.inputBorder}`,
                   borderRadius: 12, padding: "9px 14px" }}>
                   <CalendarDays size={14} color={BRAND} />
                   <input
                     type="number" value={ano}
                     onChange={(e) => setAno(Number(e.target.value))}
-                    style={{ background: "transparent", outline: "none", color: "#fff",
+                    style={{ background: "transparent", outline: "none", color: T.inputText,
                       fontSize: 13, width: 52, border: "none" }}
                   />
                 </div>
@@ -504,7 +614,7 @@ export default function FolgaDominicalPage() {
 
               {/* Mês */}
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label style={{ fontSize: 10, color: "rgba(255,255,255,0.30)", fontWeight: 700,
+                <label style={{ fontSize: 10, color: T.anoLabel, fontWeight: 700,
                   textTransform: "uppercase", letterSpacing: "0.12em" }}>Mês</label>
                 <StyledSelect value={mes} onChange={(v) => setMes(Number(v))}>
                   {MESES.map((m) => (
@@ -519,13 +629,15 @@ export default function FolgaDominicalPage() {
                 disabled={loading || previewLoading}
                 style={{
                   height: 40, padding: "0 18px", borderRadius: 12,
-                  background: "#1c1c1c", border: "1px solid rgba(255,255,255,0.08)",
-                  color: "#fff", fontSize: 13, fontWeight: 600,
+                  background: T.btnBg,
+                  border: `1px solid ${T.btnBorder}`,
+                  color: T.btnText,
+                  fontSize: 13, fontWeight: 600,
                   cursor: "pointer", display: "flex", alignItems: "center", gap: 7,
                   opacity: (loading || previewLoading) ? 0.5 : 1, transition: "all 0.2s",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = T.btnBorderHover)}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = T.btnBorder)}
               >
                 <RefreshCcw size={14} style={{ animation: loading ? "spin 0.8s linear infinite" : "none" }} />
                 Atualizar
@@ -559,7 +671,7 @@ export default function FolgaDominicalPage() {
                     title={previewNaoExecutado ? "Execute a simulação antes de gerar" : previewInvalido ? "Existem colaboradores não alocados" : "Gerar planejamento"}
                     style={{
                       height: 40, padding: "0 20px", borderRadius: 12,
-                      background: (previewInvalido || previewNaoExecutado) ? "#2a2a2a" : BRAND,
+                      background: (previewInvalido || previewNaoExecutado) ? T.disabledBtn : BRAND,
                       color: "#fff", fontSize: 13, fontWeight: 700,
                       border: "none", cursor: (previewInvalido || previewNaoExecutado) ? "not-allowed" : "pointer",
                       display: "flex", alignItems: "center", gap: 7,
@@ -647,7 +759,7 @@ export default function FolgaDominicalPage() {
                         textTransform: "uppercase", letterSpacing: "0.1em",
                       }}>Preview</span>
                     </div>
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.28)" }}>
+                    <span style={{ fontSize: 12, color: T.previewMeta }}>
                       {MESES.find(m => m.value === mes)?.label} {ano}
                     </span>
                   </div>
@@ -662,31 +774,17 @@ export default function FolgaDominicalPage() {
 
                   {/* KPIs simulação */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <KpiCard
-                      label="Elegíveis"
-                      value={previewData.totalElegiveis ?? 0}
-                      icon={Users}
-                      color={BLUE}
-                    />
-                    <KpiCard
-                      label="Alocados"
-                      value={previewData.totalPreview ?? 0}
-                      icon={CheckCircle2}
-                      color={GREEN}
-                    />
-                    <KpiCard
-                      label="Não alocados"
-                      value={previewData.naoAlocados?.length ?? 0}
-                      icon={AlertTriangle}
-                      color={(previewData.naoAlocados?.length ?? 0) > 0 ? RED : GREEN}
-                    />
+                    <KpiCard label="Elegíveis"    value={previewData.totalElegiveis ?? 0}           icon={Users}         color={BLUE}  />
+                    <KpiCard label="Alocados"     value={previewData.totalPreview ?? 0}             icon={CheckCircle2}  color={GREEN} />
+                    <KpiCard label="Não alocados" value={previewData.naoAlocados?.length ?? 0}      icon={AlertTriangle}
+                      color={(previewData.naoAlocados?.length ?? 0) > 0 ? RED : GREEN} />
                   </div>
 
                   {/* Capacidade por turno */}
                   {Object.keys(previewData.capacidade || {}).length > 0 && (
                     <div>
                       <p style={{ margin: "0 0 12px", fontSize: 12, fontWeight: 600,
-                        color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        color: T.previewMeta, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                         Capacidade por Turno
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -709,11 +807,11 @@ export default function FolgaDominicalPage() {
                         {previewData.naoAlocados.map((c) => (
                           <div key={c.opsId} style={{
                             display: "flex", alignItems: "center", justifyContent: "space-between",
-                            gap: 12, background: "#111", borderRadius: 10, padding: "10px 14px",
+                            gap: 12, background: T.itemBg, borderRadius: 10, padding: "10px 14px",
                             border: `1px solid ${RED}20`,
                           }}>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{c.nome}</span>
-                            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", textAlign: "right" }}>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: T.itemText }}>{c.nome}</span>
+                            <span style={{ fontSize: 11, color: T.itemSub, textAlign: "right" }}>
                               {c.turno} • Slot {c.slotBase}{c.motivo ? ` • ${c.motivo}` : ""}
                             </span>
                           </div>
@@ -728,7 +826,7 @@ export default function FolgaDominicalPage() {
                       {/* Filtros preview */}
                       <div style={{ display: "flex", alignItems: "center", gap: 10,
                         flexWrap: "wrap", marginBottom: 14 }}>
-                        <Filter size={13} color="rgba(255,255,255,0.30)" />
+                        <Filter size={13} color={T.filterIcon} />
                         <StyledSelect value={previewTurno} onChange={setPreviewTurno}>
                           <option value="">Todos os turnos</option>
                           <option value="T1">T1</option>
@@ -745,24 +843,23 @@ export default function FolgaDominicalPage() {
                           <button
                             onClick={() => { setPreviewTurno(""); setPreviewDomingo(""); }}
                             style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px",
-                              borderRadius: 8, background: "rgba(255,255,255,0.06)",
-                              border: "none", color: "rgba(255,255,255,0.50)", fontSize: 12,
+                              borderRadius: 8, background: T.clearBg,
+                              border: "none", color: T.clearText, fontSize: 12,
                               cursor: "pointer", transition: "background 0.2s" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.10)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = T.clearHover)}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = T.clearBg)}
                           >
                             <X size={12} /> Limpar
                           </button>
                         )}
-                        <span style={{ marginLeft: "auto", fontSize: 12,
-                          color: "rgba(255,255,255,0.28)" }}>
+                        <span style={{ marginLeft: "auto", fontSize: 12, color: T.previewMeta }}>
                           {previewFiltrado.length} registros
                         </span>
                       </div>
 
                       {/* Tabela preview */}
                       <div style={{ overflowX: "auto", borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,0.06)" }}>
+                        border: `1px solid ${T.tableBorder}` }}>
                         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 680 }}>
                           <thead>
                             <tr>
@@ -780,16 +877,16 @@ export default function FolgaDominicalPage() {
                             {previewFiltrado.map((item) => (
                               <tr key={`${item.opsId}-${item.domingo}`}
                                 style={{ transition: "background 0.15s" }}
-                                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.03)")}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = T.rowHover)}
                                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                               >
                                 <TD><span style={{ fontWeight: 700, color: BLUE }}>{item.opsId}</span></TD>
                                 <TD>{item.nome}</TD>
-                                <TD center><Badge value={item.turno} map={TURNO_COLORS} /></TD>
+                                <TD center><Badge value={item.turno}  map={TURNO_COLORS}  /></TD>
                                 <TD center><Badge value={item.escala} map={ESCALA_COLORS} /></TD>
                                 <TD center>{item.slot || "—"}</TD>
                                 <TD center>{item.domingo ? formatDateBR(item.domingo) : "—"}</TD>
-                                <TD center style={{ color: "rgba(255,255,255,0.45)" }}>
+                                <TD center style={{ color: T.altText }}>
                                   {item.ultimaFolgaAnterior ? formatDateBR(item.ultimaFolgaAnterior) : "—"}
                                 </TD>
                                 <TD center><DiasBadge dias={item.diasDesdeUltimaFolga} /></TD>
@@ -852,20 +949,20 @@ export default function FolgaDominicalPage() {
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   flexWrap: "wrap", gap: 14, padding: "18px 22px",
-                  borderBottom: "1px solid rgba(255,255,255,0.06)",
+                  borderBottom: `1px solid ${T.sectionBorder}`,
                 }}>
                   <div>
                     <p style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
                       Escala de folgas
                     </p>
-                    <p style={{ margin: "3px 0 0", fontSize: 12, color: "rgba(255,255,255,0.30)" }}>
+                    <p style={{ margin: "3px 0 0", fontSize: 12, color: T.sectionSubtitle }}>
                       {colaboradoresFiltrados.length} de {resumo?.colaboradores?.length ?? 0} colaboradores
                       {hasActiveFilter && " (filtro ativo)"}
                     </p>
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                    <Filter size={13} color="rgba(255,255,255,0.30)" />
+                    <Filter size={13} color={T.filterIcon} />
 
                     <StyledSelect value={turnoSelecionado} onChange={setTurnoSelecionado}>
                       <option value="">Todos os turnos</option>
@@ -884,9 +981,7 @@ export default function FolgaDominicalPage() {
                     <StyledSelect value={liderSelecionado} onChange={setLiderSelecionado}>
                       <option value="">Todos os líderes</option>
                       {lideres.map((l) => (
-                        <option key={l} value={l}>
-                          {l}
-                        </option>
+                        <option key={l} value={l}>{l}</option>
                       ))}
                     </StyledSelect>
 
@@ -917,12 +1012,12 @@ export default function FolgaDominicalPage() {
                         }}
                         style={{
                           display: "flex", alignItems: "center", gap: 5, padding: "6px 12px",
-                          borderRadius: 8, background: "rgba(255,255,255,0.06)",
-                          border: "none", color: "rgba(255,255,255,0.45)",
+                          borderRadius: 8, background: T.clearBg,
+                          border: "none", color: T.clearText,
                           fontSize: 12, cursor: "pointer", transition: "background 0.2s",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.10)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = T.clearHover)}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = T.clearBg)}
                       >
                         <X size={12} /> Limpar filtros
                       </button>
@@ -951,7 +1046,7 @@ export default function FolgaDominicalPage() {
                         <tr>
                           <td colSpan={8} style={{
                             padding: "48px 24px", textAlign: "center",
-                            color: "rgba(255,255,255,0.20)", fontSize: 13,
+                            color: T.empty, fontSize: 13,
                           }}>
                             Nenhum colaborador encontrado com os filtros aplicados.
                           </td>
@@ -961,25 +1056,25 @@ export default function FolgaDominicalPage() {
                           <tr
                             key={`${colab.opsId}-${colab.dataDomingo}`}
                             style={{ transition: "background 0.15s" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = T.rowHover)}
                             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                           >
                             <TD>
                               <span style={{ fontWeight: 700, color: BRAND }}>{colab.opsId}</span>
                             </TD>
                             <TD>
-                              <span style={{ color: "#fff", fontWeight: 500 }}>
+                              <span style={{ color: T.nameText, fontWeight: 500 }}>
                                 {colab.nome?.split(" ").slice(0, 3).join(" ")}
                               </span>
                             </TD>
-                            <TD center><Badge value={colab.turno} map={TURNO_COLORS} /></TD>
+                            <TD center><Badge value={colab.turno}  map={TURNO_COLORS}  /></TD>
                             <TD center><Badge value={colab.escala} map={ESCALA_COLORS} /></TD>
                             <TD>{colab.lider || "—"}</TD>
                             <TD>{colab.setor || "—"}</TD>
-                            <TD center style={{ color: "#fff", fontWeight: 600 }}>
+                            <TD center style={{ color: T.dateText, fontWeight: 600 }}>
                               {colab.dataDomingo ? formatDateWithWeekday(colab.dataDomingo) : "—"}
                             </TD>
-                            <TD center style={{ color: "rgba(255,255,255,0.45)", fontSize: 12 }}>
+                            <TD center style={{ color: T.altText, fontSize: 12 }}>
                               {colab.ultimoDSR ? formatDateWithWeekday(colab.ultimoDSR) : "—"}
                             </TD>
                             <TD center><DiasBadge dias={colab.diasSemDSR} /></TD>
