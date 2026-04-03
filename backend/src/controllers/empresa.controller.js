@@ -45,8 +45,9 @@ const getAllEmpresas = async (req, res) => {
       include: {
         _count: {
           select: {
-            colaboradores: true,
-            contratos: true,
+            colaboradores: {
+              where: { status: 'ATIVO' },
+            },
           },
         },
       },

@@ -1,6 +1,6 @@
 // src/pages/empresas.jsx
-import { useEffect, useState, useCallback } from "react";
-import { Plus, Search } from "lucide-react";
+import { useEffect, useState, useCallback, useContext } from "react";
+import { Plus, Search, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/Sidebar";
@@ -9,9 +9,50 @@ import LoadingScreen from "../components/LoadingScreen";
 import EmpresaModal from "../components/EmpresaModal";
 import EmpresaTable from "../components/EmpresaTable";
 import { EmpresasAPI } from "../services/empresas";
+import { ThemeContext } from "../context/ThemeContext";
+
+/* ─── tema ─────────────────────────────────────────── */
+const THEME = {
+  dark: {
+    bg:          "#0D0D0F",
+    card:        "#111113",
+    cardBorder:  "#27272A",
+    textMain:    "#F4F4F5",
+    textMuted:   "#A1A1AA",
+    textSubtle:  "#71717A",
+    inputBg:     "#18181B",
+    inputBorder: "#3F3F46",
+    inputText:   "#F4F4F5",
+    inputPH:     "#71717A",
+    focusRing:   "#FA4C00",
+    emptyText:   "#71717A",
+    countBg:     "#1E1B30",
+    countText:   "#A78BFA",
+    countBorder: "#4C1D95",
+  },
+  light: {
+    bg:          "#F4F4F5",
+    card:        "#FFFFFF",
+    cardBorder:  "#E4E4E7",
+    textMain:    "#18181B",
+    textMuted:   "#52525B",
+    textSubtle:  "#A1A1AA",
+    inputBg:     "#FFFFFF",
+    inputBorder: "#D4D4D8",
+    inputText:   "#18181B",
+    inputPH:     "#A1A1AA",
+    focusRing:   "#FA4C00",
+    emptyText:   "#A1A1AA",
+    countBg:     "#EFF6FF",
+    countText:   "#2563EB",
+    countBorder: "#BFDBFE",
+  },
+};
 
 export default function EmpresasPage() {
   const navigate = useNavigate();
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
 
   const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,8 +60,9 @@ export default function EmpresasPage() {
   const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchFocus, setSearchFocus] = useState(false);
 
-  /* ================= LOAD ================= */
+  /* ── load ────────────────────────────────────────── */
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -42,7 +84,7 @@ export default function EmpresasPage() {
   }, [load]);
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white">
+    <div style={{ display: "flex", minHeight: "100vh", background: T.bg, color: T.textMain }}>
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -52,91 +94,166 @@ export default function EmpresasPage() {
       <div className="flex-1 lg:ml-64">
         <Header onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="px-8 py-6 space-y-6 max-w-7xl mx-auto">
-          {/* ================= HEADER ================= */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Empresas</h1>
-              <p className="text-sm text-[#BFBFC3]">
-                Gestão de empresas, contratos e vínculos operacionais
-              </p>
+        <main style={{ padding: "28px 32px", maxWidth: 1280, margin: "0 auto" }}>
+
+          {/* ── cabeçalho ─────────────────────────────── */}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  background: isDark ? "#1F1F22" : "#FFF1EC",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#FA4C00",
+                  flexShrink: 0,
+                }}
+              >
+                <Building2 size={22} />
+              </div>
+              <div>
+                <h1 style={{ fontSize: 22, fontWeight: 700, color: T.textMain, margin: 0 }}>
+                  Empresas
+                </h1>
+                <p style={{ fontSize: 13, color: T.textSubtle, margin: "3px 0 0" }}>
+                  Gestão de empresas e vínculos operacionais
+                </p>
+              </div>
             </div>
 
-            <button
-              onClick={() => {
-                setSelected(null);
-                setModalOpen(true);
-              }}
-              className="
-                flex items-center gap-2
-                px-5 py-2.5
-                rounded-xl
-                bg-[#FA4C00]
-                hover:bg-[#ff5a1a]
-                text-sm font-medium
-              "
-            >
-              <Plus size={16} />
-              Nova Empresa
-            </button>
+            {/* kpi */}
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              {!loading && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "6px 14px",
+                    borderRadius: 999,
+                    background: T.countBg,
+                    border: `1px solid ${T.countBorder}`,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: T.countText,
+                  }}
+                >
+                  <Building2 size={13} />
+                  {empresas.length} empresa{empresas.length !== 1 ? "s" : ""}
+                </div>
+              )}
+
+              <button
+                onClick={() => { setSelected(null); setModalOpen(true); }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "9px 18px",
+                  borderRadius: 10,
+                  background: "#FA4C00",
+                  color: "#FFFFFF",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  border: "none",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "background 0.15s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#FF5A1A")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "#FA4C00")}
+              >
+                <Plus size={15} />
+                Nova Empresa
+              </button>
+            </div>
           </div>
 
-          {/* ================= SEARCH ================= */}
-          <div className="relative w-96">
-            <Search
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#BFBFC3]"
-            />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar por razão social ou CNPJ"
-              className="
-                w-full pl-9 pr-4 py-2.5
-                rounded-xl
-                bg-[#1A1A1C]
-                border border-[#3D3D40]
-                text-sm text-white
-                placeholder:text-[#BFBFC3]
-                outline-none
-                focus:ring-1 focus:ring-[#FA4C00]
-              "
-            />
+          {/* ── barra de busca ────────────────────────── */}
+          <div style={{ marginBottom: 20, maxWidth: 420 }}>
+            <div style={{ position: "relative" }}>
+              <Search
+                size={15}
+                style={{
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: T.inputPH,
+                  pointerEvents: "none",
+                }}
+              />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setSearchFocus(true)}
+                onBlur={() => setSearchFocus(false)}
+                placeholder="Buscar por razão social ou CNPJ"
+                style={{
+                  width: "100%",
+                  paddingLeft: 36,
+                  paddingRight: 14,
+                  paddingTop: 9,
+                  paddingBottom: 9,
+                  borderRadius: 10,
+                  background: T.inputBg,
+                  border: `1px solid ${searchFocus ? T.focusRing : T.inputBorder}`,
+                  color: T.inputText,
+                  fontSize: 13,
+                  outline: "none",
+                  transition: "border-color 0.15s ease",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
           </div>
 
-          {/* ================= TABLE ================= */}
-          <section className="bg-[#1A1A1C] border border-[#3D3D40] rounded-2xl overflow-hidden">
+          {/* ── tabela ────────────────────────────────── */}
+          <div
+            style={{
+              background: T.card,
+              border: `1px solid ${T.cardBorder}`,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}
+          >
             {loading ? (
               <LoadingScreen message="Carregando empresas..." />
             ) : empresas.length === 0 ? (
-              <div className="p-10 text-center text-[#BFBFC3]">
-                Nenhuma empresa cadastrada
+              <div
+                style={{
+                  padding: "60px 20px",
+                  textAlign: "center",
+                  color: T.emptyText,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 12,
+                }}
+              >
+                <Building2 size={40} strokeWidth={1.2} style={{ opacity: 0.35 }} />
+                <p style={{ fontSize: 14 }}>Nenhuma empresa encontrada</p>
               </div>
             ) : (
               <EmpresaTable
                 empresas={empresas}
-                onEdit={(empresa) => {
-                  setSelected(empresa);
-                  setModalOpen(true);
-                }}
+                onEdit={(empresa) => { setSelected(empresa); setModalOpen(true); }}
                 onDelete={async (empresa) => {
-                  if (
-                    !window.confirm(
-                      `Deseja excluir a empresa "${empresa.razaoSocial}"?`
-                    )
-                  )
-                    return;
-
+                  if (!window.confirm(`Deseja excluir a empresa "${empresa.razaoSocial}"?`)) return;
                   await EmpresasAPI.excluir(empresa.idEmpresa);
                   load();
                 }}
               />
             )}
-          </section>
+          </div>
+
         </main>
       </div>
 
-      {/* ================= MODAL ================= */}
+      {/* ── modal ─────────────────────────────────────── */}
       {modalOpen && (
         <EmpresaModal
           empresa={selected}

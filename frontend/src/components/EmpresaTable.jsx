@@ -1,155 +1,330 @@
-import { Badge, Button } from "../components/UIComponents";
+import { useContext, useState } from "react";
+import { Pencil, Trash2, Users, Building2 } from "lucide-react";
+import { ThemeContext } from "../context/ThemeContext";
 
+/* ─── tema ─────────────────────────────────────────── */
+const THEME = {
+  dark: {
+    card:        "#111113",
+    cardBorder:  "#27272A",
+    cardHover:   "#18181B",
+    textMain:    "#F4F4F5",
+    textMuted:   "#A1A1AA",
+    textSubtle:  "#71717A",
+    divider:     "#27272A",
+    avatarBg:    "#1F1F22",
+    avatarText:  "#FA4C00",
+    badgeBg:     "#1A2E1A",
+    badgeText:   "#4ADE80",
+    badgeBorder: "#166534",
+    badgeOffBg:  "#2A1A1A",
+    badgeOffTxt: "#F87171",
+    badgeOffBdr: "#7F1D1D",
+    countBg:     "#1E1B30",
+    countText:   "#A78BFA",
+    countBorder: "#4C1D95",
+    btnEditBg:       "transparent",
+    btnEditBorder:   "#3F3F46",
+    btnEditText:     "#A1A1AA",
+    btnEditHover:    "#27272A",
+    btnDelBg:        "transparent",
+    btnDelBorder:    "#4A1A1A",
+    btnDelText:      "#F87171",
+    btnDelHover:     "#3F1515",
+    emptyText:   "#71717A",
+  },
+  light: {
+    card:        "#FFFFFF",
+    cardBorder:  "#E4E4E7",
+    cardHover:   "#FAFAFA",
+    textMain:    "#18181B",
+    textMuted:   "#52525B",
+    textSubtle:  "#A1A1AA",
+    divider:     "#F4F4F5",
+    avatarBg:    "#FFF1EC",
+    avatarText:  "#FA4C00",
+    badgeBg:     "#F0FDF4",
+    badgeText:   "#15803D",
+    badgeBorder: "#BBF7D0",
+    badgeOffBg:  "#FEF2F2",
+    badgeOffTxt: "#DC2626",
+    badgeOffBdr: "#FECACA",
+    countBg:     "#EFF6FF",
+    countText:   "#2563EB",
+    countBorder: "#BFDBFE",
+    btnEditBg:       "#FFFFFF",
+    btnEditBorder:   "#E4E4E7",
+    btnEditText:     "#52525B",
+    btnEditHover:    "#F4F4F5",
+    btnDelBg:        "#FFFFFF",
+    btnDelBorder:    "#FECACA",
+    btnDelText:      "#DC2626",
+    btnDelHover:     "#FEF2F2",
+    emptyText:   "#A1A1AA",
+  },
+};
+
+/* ─── avatar com iniciais ───────────────────────────── */
+function Avatar({ name, T }) {
+  const initials = name
+    ? name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase()
+    : "?";
+
+  return (
+    <div
+      style={{
+        width: 42,
+        height: 42,
+        borderRadius: 12,
+        background: T.avatarBg,
+        color: T.avatarText,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: 700,
+        fontSize: 14,
+        letterSpacing: "0.02em",
+        flexShrink: 0,
+      }}
+    >
+      {initials}
+    </div>
+  );
+}
+
+/* ─── badge status ──────────────────────────────────── */
+function StatusBadge({ ativo, T }) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        padding: "3px 10px",
+        borderRadius: 999,
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: "0.03em",
+        background: ativo ? T.badgeBg   : T.badgeOffBg,
+        color:      ativo ? T.badgeText : T.badgeOffTxt,
+        border:     `1px solid ${ativo ? T.badgeBorder : T.badgeOffBdr}`,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <span
+        style={{
+          width: 6, height: 6,
+          borderRadius: "50%",
+          background: ativo ? T.badgeText : T.badgeOffTxt,
+          display: "inline-block",
+          flexShrink: 0,
+        }}
+      />
+      {ativo ? "Ativa" : "Inativa"}
+    </span>
+  );
+}
+
+/* ─── badge contagem ────────────────────────────────── */
+function CountBadge({ count, T }) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        padding: "3px 10px",
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 600,
+        background: T.countBg,
+        color:      T.countText,
+        border:     `1px solid ${T.countBorder}`,
+      }}
+    >
+      <Users size={11} />
+      {count}
+    </span>
+  );
+}
+
+/* ─── botão de ação ─────────────────────────────────── */
+function ActionBtn({ label, icon, bg, border, color, hoverBg, onClick }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "6px 13px",
+        borderRadius: 8,
+        fontSize: 12,
+        fontWeight: 500,
+        cursor: "pointer",
+        border: `1px solid ${border}`,
+        background: hov ? hoverBg : bg,
+        color,
+        transition: "background 0.15s ease",
+        outline: "none",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+/* ─── componente principal ──────────────────────────── */
 export default function EmpresaTable({ empresas, onEdit, onDelete }) {
+  const { isDark } = useContext(ThemeContext);
+  const T = THEME[isDark ? "dark" : "light"];
+
   if (!empresas?.length) {
     return (
-      <div className="p-8 text-center text-[#BFBFC3]">
-        Nenhuma empresa cadastrada
+      <div
+        style={{
+          padding: "60px 20px",
+          textAlign: "center",
+          color: T.emptyText,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <Building2 size={40} strokeWidth={1.2} style={{ opacity: 0.4 }} />
+        <p style={{ fontSize: 14 }}>Nenhuma empresa cadastrada</p>
       </div>
     );
   }
 
+  const cols = Math.min(empresas.length, 3);
+
   return (
-    <div className="w-full">
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gap: 16,
+        padding: 20,
+      }}
+    >
+      {empresas.map((e) => (
+        <EmpresaCard
+          key={e.idEmpresa}
+          empresa={e}
+          T={T}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ))}
+    </div>
+  );
+}
 
-      {/* ================= DESKTOP TABLE ================= */}
-      <div className="hidden md:block overflow-x-auto rounded-xl">
-        <table className="w-full min-w-[900px] text-sm">
-          <thead className="bg-[#1A1A1C] border-b border-[#3D3D40]">
-            <tr className="text-xs uppercase text-[#BFBFC3]">
-              {[
-                "ID",
-                "Razão Social",
-                "CNPJ",
-                "Colab.",
-                "Contratos",
-                "Status",
-                "",
-              ].map((h) => (
-                <th
-                  key={h}
-                  className={`px-5 py-4 font-semibold ${
-                    h === "" ? "text-right" : "text-left"
-                  }`}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
+/* ─── card individual ───────────────────────────────── */
+function EmpresaCard({ empresa: e, T, onEdit, onDelete }) {
+  const [hov, setHov] = useState(false);
 
-          <tbody>
-            {empresas.map((e, index) => (
-              <tr
-                key={e.idEmpresa}
-                className={`
-                  ${index % 2 === 0 ? "bg-[#1A1A1C]" : "bg-[#2A2A2C]"}
-                  hover:bg-[#242426] transition
-                `}
-              >
-                <td className="px-5 py-4 text-white">
-                  {e.idEmpresa}
-                </td>
-
-                <td className="px-5 py-4 font-medium text-white">
-                  {e.razaoSocial}
-                </td>
-
-                <td className="px-5 py-4 text-[#BFBFC3]">
-                  {e.cnpj}
-                </td>
-
-                <td className="px-5 py-4 text-center text-white">
-                  {e._count?.colaboradores ?? 0}
-                </td>
-
-                <td className="px-5 py-4 text-center text-white">
-                  {e._count?.contratos ?? 0}
-                </td>
-
-                <td className="px-5 py-4">
-                  <Badge.Status variant={e.ativo ? "success" : "danger"}>
-                    {e.ativo ? "Ativa" : "Inativa"}
-                  </Badge.Status>
-                </td>
-
-                <td className="px-5 py-4 text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button.Secondary size="sm" onClick={() => onEdit(e)}>
-                      Editar
-                    </Button.Secondary>
-
-                    <Button.IconButton
-                      size="sm"
-                      variant="danger"
-                      onClick={() => onDelete(e)}
-                    >
-                      Excluir
-                    </Button.IconButton>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ================= MOBILE CARD VIEW ================= */}
-      <div className="md:hidden space-y-4">
-        {empresas.map((e) => (
-          <div
-            key={e.idEmpresa}
-            className="bg-[#1A1A1C] border border-[#3D3D40] rounded-xl p-4 space-y-3"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-white font-semibold text-sm">
-                  {e.razaoSocial}
-                </p>
-
-                <p className="text-xs text-[#BFBFC3] mt-1">
-                  ID: {e.idEmpresa}
-                </p>
-              </div>
-
-              <Badge.Status variant={e.ativo ? "success" : "danger"}>
-                {e.ativo ? "Ativa" : "Inativa"}
-              </Badge.Status>
-            </div>
-
-            <div className="text-xs text-[#BFBFC3] space-y-1">
-              <p>CNPJ: {e.cnpj}</p>
-              <p>
-                Colaboradores:{" "}
-                <span className="text-white font-medium">
-                  {e._count?.colaboradores ?? 0}
-                </span>
-              </p>
-              <p>
-                Contratos:{" "}
-                <span className="text-white font-medium">
-                  {e._count?.contratos ?? 0}
-                </span>
-              </p>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2 border-t border-[#2F2F33]">
-              <Button.Secondary size="sm" onClick={() => onEdit(e)}>
-                Editar
-              </Button.Secondary>
-
-              <Button.IconButton
-                size="sm"
-                variant="danger"
-                onClick={() => onDelete(e)}
-              >
-                Excluir
-              </Button.IconButton>
-            </div>
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: hov ? T.cardHover : T.card,
+        border: `1px solid ${T.cardBorder}`,
+        borderRadius: 14,
+        padding: "18px 20px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 14,
+        transition: "background 0.15s ease, box-shadow 0.15s ease",
+        boxShadow: hov ? "0 4px 20px rgba(0,0,0,0.08)" : "none",
+      }}
+    >
+      {/* topo: avatar + nome + status */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+          <Avatar name={e.razaoSocial} T={T} />
+          <div style={{ minWidth: 0 }}>
+            <p
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                color: T.textMain,
+                margin: 0,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {e.razaoSocial}
+            </p>
+            <p style={{ fontSize: 11, color: T.textSubtle, margin: "3px 0 0" }}>
+              ID #{e.idEmpresa}
+            </p>
           </div>
-        ))}
+        </div>
+        <StatusBadge ativo={e.ativo} T={T} />
       </div>
 
+      {/* info */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+          paddingTop: 4,
+          borderTop: `1px solid ${T.divider}`,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 12, color: T.textSubtle }}>CNPJ</span>
+          <span style={{ fontSize: 12, color: T.textMuted, fontVariantNumeric: "tabular-nums", fontWeight: 500 }}>
+            {e.cnpj}
+          </span>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 12, color: T.textSubtle }}>Colaboradores Ativos</span>
+          <CountBadge count={e._count?.colaboradores ?? 0} T={T} />
+        </div>
+      </div>
+
+      {/* ações */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          paddingTop: 10,
+          borderTop: `1px solid ${T.divider}`,
+        }}
+      >
+        <ActionBtn
+          label="Editar"
+          icon={<Pencil size={13} />}
+          bg={T.btnEditBg}
+          border={T.btnEditBorder}
+          color={T.btnEditText}
+          hoverBg={T.btnEditHover}
+          onClick={() => onEdit(e)}
+        />
+        <ActionBtn
+          label="Excluir"
+          icon={<Trash2 size={13} />}
+          bg={T.btnDelBg}
+          border={T.btnDelBorder}
+          color={T.btnDelText}
+          hoverBg={T.btnDelHover}
+          onClick={() => onDelete(e)}
+        />
+      </div>
     </div>
   );
 }
